@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
+<title>Precificação • Doceria</title>
+<meta name="theme-color" content="#9C7050"/>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  :root{
+    --brown:#9C7050;
+    --gold:#C8AD57;
+    --cream:#F3EAC1;
+    --white:#ffffff;
+    --muted:#7b6657;
+    --success:#2f8a56;
+    --danger:#d9534f;
+    --card-border: rgba(156,112,80,0.12);
+    --radius:14px;
+    --glass: rgba(255,255,255,0.9);
+    font-family: Inter, "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
+  }
+
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#fbf6e8,var(--cream));-webkit-font-smoothing:antialiased}
+  .app{max-width:440px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding:18px 12px 100px;}
+  header.app-header{
+    display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:linear-gradient(180deg,var(--glass),#fff);
+    box-shadow:0 8px 30px rgba(0,0,0,0.06);border:1px solid var(--card-border);backdrop-filter: blur(4px);
+    position:relative;overflow:hidden;
+  }
+  .logo-wrap{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--brown),var(--gold));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.06)}
+  .logo-wrap img{width:48px;height:48px;object-fit:contain;border-radius:8px}
+  h1{font-size:16px;margin:0;color:var(--brown)}
+  p.subtitle{margin:0;color:var(--muted);font-size:12px}
+  main.content{margin-top:12px;flex:1;display:flex;flex-direction:column;gap:12px}
+
+  .card{background: linear-gradient(180deg,#fff,#fff);padding:12px;border-radius:14px;box-shadow:0 8px 20px rgba(0,0,0,0.06);border:1px solid var(--card-border);overflow:hidden}
+  label{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px;display:block}
+  input[type="number"], input[type="text"], select, textarea{
+    padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:#fff;font-size:14px;color:var(--brown);
+    width:100%;box-sizing:border-box;
+  }
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .row{display:flex;gap:8px;align-items:center}
+  .muted{color:var(--muted);font-size:13px}
+  .btn{background:var(--brown);color:var(--white);padding:10px 12px;border-radius:10px;border:none;font-weight:700;cursor:pointer;transition:transform .12s, box-shadow .12s}
+  .btn:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(0,0,0,0.08)}
+  .btn.secondary{background:transparent;color:var(--brown);border:2px solid var(--gold)}
+  .small-ghost{background:transparent;border:1px dashed rgba(0,0,0,0.06);padding:8px;border-radius:8px;cursor:pointer}
+  .products-list{display:grid;gap:10px}
+  .product-row{display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:12px;border:1px solid rgba(220,210,190,0.6);background:linear-gradient(180deg,#fff,#fdf8ef)}
+  .product-row .name{font-weight:800;color:var(--brown)}
+  .pill{background:var(--gold);color:var(--brown);padding:6px 8px;border-radius:999px;font-weight:700;font-size:12px}
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .summary-box{padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#fff);border:1px solid var(--card-border)}
+  .summary-box .v{font-weight:800;color:var(--brown);font-size:16px}
+  .footer-bar{position:fixed;left:0;right:0;bottom:12px;max-width:440px;margin:0 auto;background:linear-gradient(180deg,#fff,var(--cream));padding:10px;border-radius:999px;border:1px solid rgba(0,0,0,0.04);display:flex;gap:6px;align-items:center;justify-content:space-around;box-shadow:0 -10px 30px rgba(0,0,0,0.06)}
+  .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px;border-radius:10px;color:var(--muted);font-weight:700;cursor:pointer;transition:all .18s}
+  .tab-btn.active{background:linear-gradient(180deg,var(--gold),#e7cc87);color:var(--brown);transform:translateY(-6px);box-shadow:0 8px 18px rgba(0,0,0,0.08)}
+  .chart-wrap{height:160px}
+  .muted-small{font-size:12px;color:var(--muted)}
+  .animate-fade{animation:fadeInUp .36s both ease-out}
+  @keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .small-ghost{font-weight:700}
+  /* responsive tweaks */
+  @media (max-width:420px){
+    .app{padding:12px 10px 100px}
+    .logo-wrap{width:46px;height:46px}
+  }
+</style>
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="app-header">
+      <!-- Replace src with your uploaded logo path (assets/logo.png) -->
+      <div class="logo-wrap"><img src="assets/logo.png" alt="Logo" id="logoImg" /></div>
+      <div style="flex:1">
+        <h1>Precificação • Doceria</h1>
+        <p class="subtitle">Calc. CMV · Markup 3× · iFood · Offline</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn small" id="btnExportCSV">Exportar CSV</button>
+        <button class="btn small secondary" id="btnReset">Reset</button>
+      </div>
+    </header>
+
+    <main class="content" id="content">
+      <!-- Config -->
+      <section id="tab-config" class="card animate-fade">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><strong>Configurações</strong><div class="muted">Defina custos fixos, meta e canais</div></div>
+          <div><button class="small-ghost" id="btnSaveManual">Salvar</button></div>
+        </div>
+
+        <div style="margin-top:12px" class="grid-3">
+          <div><label>Aluguel (R$)</label><input type="number" id="aluguel" value="1500" /></div>
+          <div><label>Energia (R$)</label><input type="number" id="energia" value="300" /></div>
+          <div><label>Água (R$)</label><input type="number" id="agua" value="30" /></div>
+        </div>
+
+        <div style="margin-top:10px" class="grid-3">
+          <div><label>Internet (R$)</label><input type="number" id="internet" value="100" /></div>
+          <div><label>Telefone (R$)</label><input type="number" id="telefone" value="30" /></div>
+          <div><label>Gás (R$)</label><input type="number" id="gas" value="110" /></div>
+        </div>
+
+        <div style="margin-top:10px" class="grid-3">
+          <div><label>Marketing (R$)</label><input type="number" id="marketing" value="400" /></div>
+          <div><label>Taxas fixas apps (R$)</label><input type="number" id="taxasApps" value="130" /></div>
+          <div><label>Taxa iFood (%)</label><input type="number" id="taxaIfood" value="23" /></div>
+        </div>
+
+        <div style="margin-top:12px" class="grid-2">
+          <div><label>Meta de lucro mensal (R$)</label><input type="number" id="metaLucroMensal" value="3500" /></div>
+          <div><label>% Absorção progressiva (fixos no preço)</label><input type="number" id="absorcaoProgressiva" value="30" /></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <label>Distribuição de canais (modifique para simular)</label>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <input type="number" id="percVendasDiretas" value="70" style="width:40%" />
+            <input type="number" id="percVendasIfood" value="30" style="width:40%" />
+            <div class="muted" style="align-self:center">Total: <span id="distTotal">100%</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Produtos -->
+      <section id="tab-products" class="card" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><strong>Produtos</strong><div class="muted">Cadastre seus produtos (edite valores)</div></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn small" id="btnAddProduct">+ Produto</button>
+            <button class="small-ghost" id="btnNormalize">Normalizar %</button>
+          </div>
+        </div>
+
+        <div style="margin-top:12px" id="productsContainer" class="products-list"></div>
+      </section>
+
+      <!-- Resultados -->
+      <section id="tab-results" class="card" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><strong>Resultados</strong><div class="muted">Faturamento mínimo e vendas necessárias por produto</div></div>
+          <div class="csv-actions">
+            <button class="btn small" id="btnCSVDownload">Download CSV</button>
+          </div>
+        </div>
+
+        <div style="margin-top:12px" class="summary-grid">
+          <div class="summary-box"><div class="muted">Custos Fixos Totais</div><div class="v" id="fixedTotal">R$ 0,00</div></div>
+          <div class="summary-box"><div class="muted">Meta Lucro</div><div class="v" id="metaVal">R$ 0,00</div></div>
+          <div class="summary-box"><div class="muted">Faturamento Mínimo</div><div class="v" id="faturamentoMin">R$ 0,00</div></div>
+          <div class="summary-box"><div class="muted">Custo Hora Médio</div><div class="v" id="custoHoraMedio">R$ 0,00</div></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <strong>Quantidade mínima necessária por produto</strong>
+          <div id="qtdResult" style="margin-top:8px"></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <strong>Análises</strong>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
+            <div class="card">
+              <div class="muted-small">Distribuição de participação</div>
+              <div class="chart-wrap"><canvas id="participChart"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="muted-small">CMV médio ponderado</div>
+              <div class="chart-wrap"><canvas id="cmvChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <nav class="footer-bar" id="footer">
+      <div class="tab-btn active" data-tab="config" id="tabbtn-config">⚙️ Config</div>
+      <div class="tab-btn" data-tab="products" id="tabbtn-products">🍰 Produtos</div>
+      <div class="tab-btn" data-tab="results" id="tabbtn-results">📊 Resultados</div>
+    </nav>
+  </div>
+
+<script>
+/* ========= STATE ========= */
+const STORAGE_KEY = 'doceria_precificacao_v2';
+let state = {
+  config:{
+    aluguel:1500,energia:300,agua:30,internet:100,telefone:30,gas:110,marketing:400,taxasApps:130,
+    taxaIfood:23,percVendasDiretas:70,percVendasIfood:30,absorcaoProgressiva:30,metaLucroMensal:3500
+  },
+  labor:[
+    {name:'Proprietário', role:'Dono', hourlyRate:12, hoursMonth:264}
+  ],
+  products: []
+};
+function loadState(){ try{ const raw = localStorage.getItem(STORAGE_KEY); if(raw) state = JSON.parse(raw); } catch(e){ console.warn(e) } }
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); showToast('Salvo localmente'); } catch(e){ showToast('Erro ao salvar') } }
+loadState();
+
+/* ======= HELPERS ======= */
+const $ = id => document.getElementById(id);
+function money(v){ return 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function uid(){ return 'p'+Math.random().toString(36).slice(2,9) }
+function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+function showToast(msg, ms=1600){
+  const t = document.createElement('div'); t.textContent=msg;
+  t.style.cssText='position:fixed;right:18px;top:18px;background:var(--brown);color:#fff;padding:10px 12px;border-radius:10px;z-index:9999;font-weight:700';
+  document.body.appendChild(t); setTimeout(()=>t.remove(),ms);
+}
+
+/* ======= RENDER / UI ======= */
+function renderConfig(){
+  const c = state.config;
+  $('aluguel').value = c.aluguel||0; $('energia').value = c.energia||0; $('agua').value = c.agua||0;
+  $('internet').value = c.internet||0; $('telefone').value = c.telefone||0; $('gas').value = c.gas||0;
+  $('marketing').value = c.marketing||0; $('taxasApps').value = c.taxasApps||0; $('taxaIfood').value = c.taxaIfood||0;
+  $('percVendasDiretas').value = c.percVendasDiretas||0; $('percVendasIfood').value = c.percVendasIfood||0;
+  $('absorcaoProgressiva').value = c.absorcaoProgressiva||0; $('metaLucroMensal').value = c.metaLucroMensal||0;
+  updateDistributionTotal();
+}
+
+function renderProducts(){
+  const container = $('productsContainer'); container.innerHTML = '';
+  if(state.products.length === 0){
+    const empty = document.createElement('div'); empty.className='muted'; empty.textContent='Nenhum produto cadastrado. Clique em + Produto';
+    container.appendChild(empty); return;
+  }
+
+  state.products.forEach((p, idx) => {
+    const row = document.createElement('div'); row.className='product-row animate-fade';
+    const top = document.createElement('div'); top.style.display='flex'; top.style.justifyContent='space-between'; top.style.alignItems='center';
+    const left = document.createElement('div');
+    const nameIn = document.createElement('input'); nameIn.type='text'; nameIn.value = p.name; nameIn.addEventListener('change', e=> { p.name = e.target.value || 'Produto'; saveState(); renderProducts(); });
+    left.appendChild(nameIn);
+
+    const rightActions = document.createElement('div');
+    const btnDup = document.createElement('button'); btnDup.className='small-ghost'; btnDup.textContent='Duplicar'; btnDup.onclick = ()=>{ const copy = JSON.parse(JSON.stringify(p)); copy.id = uid(); state.products.push(copy); saveState(); renderProducts(); updateAll(); }
+    const btnDel = document.createElement('button'); btnDel.className='small-ghost'; btnDel.textContent='Remover'; btnDel.onclick = ()=>{ if(confirm('Remover produto?')){ state.products.splice(idx,1); saveState(); renderProducts(); updateAll(); } }
+    rightActions.appendChild(btnDup); rightActions.appendChild(btnDel);
+
+    top.appendChild(left); top.appendChild(rightActions);
+
+    // inputs grid
+    const grid = document.createElement('div'); grid.style.display='grid'; grid.style.gridTemplateColumns='1fr 1fr'; grid.style.gap='8px'; grid.style.marginTop='8px';
+    const c1 = document.createElement('div'); c1.innerHTML = '<label>Rend. por receita (un)</label>'; const inpUnits = document.createElement('input'); inpUnits.type='number'; inpUnits.value = p.unitsPerRecipe||1; inpUnits.addEventListener('change', e=>{ p.unitsPerRecipe = parseInt(e.target.value)||1; saveState(); updateAll(); }); c1.appendChild(inpUnits);
+    const c2 = document.createElement('div'); c2.innerHTML = '<label>Unidades/embalagem</label>'; const inpPack = document.createElement('input'); inpPack.type='number'; inpPack.value = p.unitsPerPackage||1; inpPack.addEventListener('change', e=>{ p.unitsPerPackage = parseInt(e.target.value)||1; saveState(); updateAll(); }); c2.appendChild(inpPack);
+    const c3 = document.createElement('div'); c3.innerHTML = '<label>Custo ingredientes (R$)</label>'; const inpIngr = document.createElement('input'); inpIngr.type='number'; inpIngr.step='0.01'; inpIngr.value = p.ingredientCost||0; inpIngr.addEventListener('change', e=>{ p.ingredientCost = parseFloat(e.target.value)||0; saveState(); updateAll(); }); c3.appendChild(inpIngr);
+    const c4 = document.createElement('div'); c4.innerHTML = '<label>Custo embalagem (R$)</label>'; const inpPackCost = document.createElement('input'); inpPackCost.type='number'; inpPackCost.step='0.01'; inpPackCost.value = p.packagingCost||0; inpPackCost.addEventListener('change', e=>{ p.packagingCost = parseFloat(e.target.value)||0; saveState(); updateAll(); }); c4.appendChild(inpPackCost);
+    const c5 = document.createElement('div'); c5.innerHTML = '<label>Tempo produção (h)</label>'; const inpTime = document.createElement('input'); inpTime.type='number'; inpTime.step='0.1'; inpTime.value = p.productionTimeHours||0.5; inpTime.addEventListener('change', e=>{ p.productionTimeHours = parseFloat(e.target.value)||0; saveState(); updateAll(); }); c5.appendChild(inpTime);
+    const c6 = document.createElement('div'); c6.innerHTML = '<label>% Participação no faturamento</label>'; const inpPct = document.createElement('input'); inpPct.type='number'; inpPct.step='0.1'; inpPct.value = p.participationPercent||0; inpPct.addEventListener('change', e=>{ p.participationPercent = clamp(parseFloat(e.target.value)||0,0,100); saveState(); updateAll(); renderProducts(); }); c6.appendChild(inpPct);
+    const c7 = document.createElement('div'); c7.innerHTML = '<label>% Margem (venda direta)</label>'; const inpMargin = document.createElement('input'); inpMargin.type='number'; inpMargin.step='0.1'; inpMargin.value = p.marginPercent||state.config.margemLucro||35; inpMargin.addEventListener('change', e=>{ p.marginPercent = clamp(parseFloat(e.target.value)||0,0,99); saveState(); updateAll(); }); c7.appendChild(inpMargin);
+
+    grid.appendChild(c1); grid.appendChild(c2);
+    grid.appendChild(c3); grid.appendChild(c4);
+    grid.appendChild(c5); grid.appendChild(c6);
+    grid.appendChild(c7);
+
+    // small help
+    const help = document.createElement('div'); help.className='muted-small'; help.style.marginTop='8px';
+    help.textContent = `ingred: ${p.ingredientCost} • embal: ${p.packagingCost} • tempo: ${p.productionTimeHours}h • %: ${p.participationPercent||0} • margem: ${p.marginPercent||state.config.margemLucro}`;
+
+    row.appendChild(top); row.appendChild(grid); row.appendChild(help);
+    container.appendChild(row);
+  });
+}
+
+/* ======= SAMPLE PRODUCTS IF EMPTY ======= */
+function addDefaultSampleProductsIfEmpty(){
+  if(state.products.length===0){
+    state.products.push({id:uid(),name:'Alfajor Maizena (caixa 6)',unitsPerRecipe:36,unitsPerPackage:6,ingredientCost:11.71,packagingCost:1.20,productionTimeHours:2,participationPercent:40,marginPercent:35});
+    state.products.push({id:uid(),name:'Brownie (un)',unitsPerRecipe:6,unitsPerPackage:1,ingredientCost:24.42,packagingCost:1.00,productionTimeHours:1,participationPercent:30,marginPercent:35});
+    state.products.push({id:uid(),name:'Cookie recheado (90g)',unitsPerRecipe:8,unitsPerPackage:1,ingredientCost:36.23,packagingCost:1.00,productionTimeHours:1.5,participationPercent:30,marginPercent:35});
+    saveState();
+  }
+}
+
+/* ======= CALCS ======= */
+function getLaborTotals(){ let totalHours=0, totalCost=0; state.labor.forEach(l=>{ totalHours += Number(l.hoursMonth||0); totalCost += Number(l.hourlyRate||0) * Number(l.hoursMonth||0); }); return { totalHours, totalCost }; }
+function getFixedCostsOperational(){ const c = state.config; const fields = ['aluguel','energia','agua','internet','telefone','gas','marketing','taxasApps']; let sum=0; fields.forEach(f=> sum+=Number(c[f]||0)); return sum; }
+function getFixedCostsTotal(){ return getFixedCostsOperational() + getLaborTotals().totalCost; }
+
+function calculatePerProduct(product){
+  const labor = getLaborTotals();
+  const avgHourly = labor.totalHours>0 ? labor.totalCost / labor.totalHours : 0;
+  const productionTime = Number(product.productionTimeHours||0);
+  const laborCostRecipe = productionTime * avgHourly;
+  const costPerUnitIngredients = Number(product.ingredientCost||0) / (Number(product.unitsPerRecipe)||1);
+  const costPerUnitLabor = laborCostRecipe / (Number(product.unitsPerRecipe)||1);
+  const costPerUnit = costPerUnitIngredients + costPerUnitLabor;
+  const costPerPackage = (costPerUnit * (product.unitsPerPackage||1)) + Number(product.packagingCost||0);
+
+  const absorcaoPct = Number(state.config.absorcaoProgressiva||0)/100;
+  const fixedCostAbsorption = costPerPackage * absorcaoPct;
+  const totalCostWithFixed = costPerPackage + fixedCostAbsorption;
+
+  const marginPct = Number(product.marginPercent||state.config.margemLucro||0)/100;
+  const precoDireto = marginPct < 0.999 ? totalCostWithFixed / (1 - marginPct) : totalCostWithFixed;
+  const taxaIfood = Number(state.config.taxaIfood||0)/100;
+  const precoIfood = precoDireto / (1 - taxaIfood);
+
+  const precoMarkup3 = costPerPackage * 3;
+  const cmv = precoDireto>0 ? (costPerPackage / precoDireto) * 100 : 0;
+  const margemUnitaria = precoDireto - totalCostWithFixed;
+
+  return { avgHourly, costPerUnit, costPerPackage, fixedCostAbsorption, totalCostWithFixed, precoDireto, precoIfood, precoMarkup3, cmv, margemUnitaria, laborCostRecipe };
+}
+
+/* ======= RESULTS ======= */
+let participationChart=null, cmvChart=null;
+function calculateResults(){
+  const fixedTotal = getFixedCostsTotal();
+  const metaLucro = Number(state.config.metaLucroMensal||0);
+  const faturamentoMin = fixedTotal + metaLucro;
+  $('fixedTotal').textContent = money(fixedTotal);
+  $('metaVal').textContent = money(metaLucro);
+  $('faturamentoMin').textContent = money(faturamentoMin);
+
+  const labor = getLaborTotals();
+  const avgHourly = labor.totalHours>0 ? labor.totalCost / labor.totalHours : 0;
+  $('custoHoraMedio').textContent = money(avgHourly);
+
+  // compute distribution
+  const qdiv = $('qtdResult'); qdiv.innerHTML = '';
+  let totalParticipation = 0; state.products.forEach(p=> totalParticipation += Number(p.participationPercent||0));
+
+  if(totalParticipation <= 0){
+    qdiv.innerHTML = '<div class="muted">Defina as % de participação dos produtos para calcular distribuição.</div>';
+  } else {
+    if(Math.abs(totalParticipation - 100) > 0.1){
+      const warn = document.createElement('div'); warn.className='muted'; warn.style.marginBottom='8px';
+      warn.innerHTML = `⚠️ A soma das participações = ${totalParticipation.toFixed(1)}%. (use "Normalizar %" para ajustar)`;
+      qdiv.appendChild(warn);
+    }
+    // charts data
+    const labels = []; const dataPct = []; const dataCMV = [];
+
+    state.products.forEach(p=>{
+      const calc = calculatePerProduct(p);
+      const particip = Number(p.participationPercent||0);
+      const faturamentoProduto = faturamentoMin * (particip/100);
+      const qtdNecessaria = calc.margemUnitaria > 0 ? Math.ceil(faturamentoProduto / calc.margemUnitaria) : 0;
+
+      const box = document.createElement('div'); box.className='product-row';
+      box.style.display='flex'; box.style.flexDirection='column';
+      const line1 = document.createElement('div'); line1.style.display='flex'; line1.style.justifyContent='space-between';
+      line1.innerHTML = `<div style="font-weight:800;color:var(--brown)">${p.name}</div><div class="pill">${particip.toFixed(1)}%</div>`;
+      const line2 = document.createElement('div'); line2.style.display='flex'; line2.style.justifyContent='space-between'; line2.style.marginTop='8px';
+      line2.innerHTML = `<div class="muted">Preço Direto: <strong>${money(calc.precoDireto)}</strong> • iFood: <strong>${money(calc.precoIfood)}</strong></div>
+                         <div style="text-align:right"><div class="muted">CMV ${calc.cmv.toFixed(1)}%</div><div style="font-weight:800">${qtdNecessaria} un/mês</div></div>`;
+      box.appendChild(line1); box.appendChild(line2);
+      qdiv.appendChild(box);
+
+      labels.push(p.name);
+      dataPct.push(particip);
+      dataCMV.push(calc.cmv);
+    });
+    updateCharts(labels, dataPct, dataCMV);
+  }
+
+  // update comparatives
+  $('displayPercDiretas').textContent = Number(state.config.percVendasDiretas||0);
+  $('displayPercIfood').textContent = Number(state.config.percVendasIfood||0);
+  const boxDireto = $('boxDireto'); const boxIfood = $('boxIfood');
+  if(boxDireto) boxDireto.innerHTML = `<div class="muted">Estimativa faturamento canal</div><div style="font-weight:800;margin-top:6px">${money(faturamentoMin * (state.config.percVendasDiretas/100))}</div>`;
+  if(boxIfood) boxIfood.innerHTML = `<div class="muted">Estimativa faturamento canal</div><div style="font-weight:800;margin-top:6px">${money(faturamentoMin * (state.config.percVendasIfood/100))}</div>`;
+}
+
+/* ======= CHARTS ======= */
+function updateCharts(labels, dataPct, dataCMV){
+  const ctx = $('participChart').getContext('2d');
+  const ctx2 = $('cmvChart').getContext('2d');
+
+  if(participationChart) participationChart.destroy();
+  participationChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels: labels, datasets: [{ data: dataPct, backgroundColor: generateColors(labels.length) }] },
+    options: { plugins:{legend:{display:false}}, maintainAspectRatio:false }
+  });
+
+  if(cmvChart) cmvChart.destroy();
+  cmvChart = new Chart(ctx2, {
+    type: 'bar',
+    data: { labels: labels, datasets: [{ label: 'CMV %', data: dataCMV, backgroundColor: generateColors(labels.length) }] },
+    options: { plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}, maintainAspectRatio:false }
+  });
+}
+
+function generateColors(n){
+  const palette = ['#C8AD57','#9C7050','#F2D9A7','#E3C89A','#D8B77C','#EEDFC8','#B78A60'];
+  const out = []; for(let i=0;i<n;i++) out.push(palette[i%palette.length]); return out;
+}
+
+/* ======= UI EVENTS ======= */
+function updateStateFromUI(){
+  const c = state.config;
+  c.aluguel = Number($('aluguel').value||0);
+  c.energia = Number($('energia').value||0);
+  c.agua = Number($('agua').value||0);
+  c.internet = Number($('internet').value||0);
+  c.telefone = Number($('telefone').value||0);
+  c.gas = Number($('gas').value||0);
+  c.marketing = Number($('marketing').value||0);
+  c.taxasApps = Number($('taxasApps').value||0);
+  c.taxaIfood = Number($('taxaIfood').value||0);
+  c.percVendasDiretas = Number($('percVendasDiretas').value||0);
+  c.percVendasIfood = Number($('percVendasIfood').value||0);
+  c.absorcaoProgressiva = Number($('absorcaoProgressiva').value||0);
+  c.metaLucroMensal = Number($('metaLucroMensal').value||0);
+  saveState(); updateDistributionTotal();
+}
+
+function updateDistributionTotal(){
+  const a = Number($('percVendasDiretas').value||0); const b = Number($('percVendasIfood').value||0);
+  $('distTotal').textContent = (a+b).toFixed(1) + '%';
+}
+
+function updateAll(){ saveState(); renderProducts(); calculateResults(); }
+
+/* buttons */
+$('btnAddProduct').addEventListener('click', ()=> {
+  const newP = { id:uid(), name:'Novo Produto', unitsPerRecipe:1, unitsPerPackage:1, ingredientCost:0, packagingCost:0, productionTimeHours:0.5, participationPercent:0, marginPercent:35 };
+  state.products.push(newP); saveState(); renderProducts(); calculateResults();
+});
+$('btnNormalize').addEventListener('click', ()=> {
+  let sum=0; state.products.forEach(p=> sum += Number(p.participationPercent||0));
+  if(sum === 0){ showToast('Soma zero — atribua % antes de normalizar'); return; }
+  state.products.forEach(p=> p.participationPercent = (Number(p.participationPercent||0) / sum) * 100);
+  saveState(); renderProducts(); calculateResults();
+});
+$('btnSaveManual').addEventListener('click', ()=> { updateStateFromUI(); showToast('Config salva'); });
+$('btnReset').addEventListener('click', ()=> { if(confirm('Resetar dados locais?')){ localStorage.removeItem(STORAGE_KEY); location.reload(); } });
+
+/* CSV export */
+function generateCSV(){
+  const rows = [['Produto','Campo','Valor']];
+  state.products.forEach(p => {
+    const calc = calculatePerProduct(p);
+    rows.push([p.name,'Unidades por receita',p.unitsPerRecipe]);
+    rows.push([p.name,'Unidades por embalagem',p.unitsPerPackage]);
+    rows.push([p.name,'Custo ingredientes (R$)',(p.ingredientCost||0).toFixed(2)]);
+    rows.push([p.name,'Custo embalagem (R$)',(p.packagingCost||0).toFixed(2)]);
+    rows.push([p.name,'Tempo produção (h)',(p.productionTimeHours||0).toFixed(2)]);
+    rows.push([p.name,'% participação',(p.participationPercent||0).toFixed(2)+'%']);
+    rows.push([p.name,'Custo unitário total (R$)',calc.totalCostWithFixed.toFixed(2)]);
+    rows.push([p.name,'Preço venda direta (R$)',calc.precoDireto.toFixed(2)]);
+    rows.push([p.name,'Preço venda iFood (R$)',calc.precoIfood.toFixed(2)]);
+    rows.push([p.name,'CMV (%)',calc.cmv.toFixed(2)+'%']);
+  });
+  return rows.map(r => r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+}
+$('btnExportCSV').addEventListener('click', ()=> {
+  const csv = generateCSV();
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(csv).then(()=> showToast('CSV copiado (cole no Sheets).'));
+  } else {
+    const ta = document.createElement('textarea'); ta.value = csv; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); showToast('CSV copiado (cole no Sheets).');
+  }
+});
+$('btnCSVDownload').addEventListener('click', ()=>{
+  const csv = generateCSV();
+  const blob = new Blob(['\uFEFF',csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'precificacao_doceria.csv'; a.click(); URL.revokeObjectURL(url); showToast('CSV baixado.');
+});
+
+/* live inputs */
+['aluguel','energia','agua','internet','telefone','gas','marketing','taxasApps','taxaIfood','percVendasDiretas','percVendasIfood','absorcaoProgressiva','metaLucroMensal'].forEach(id=>{
+  const el = $(id); if(!el) return;
+  el.addEventListener('input', ()=>{ updateStateFromUI(); calculateResults(); });
+});
+
+/* ======= TAB NAV (clean single implementation) ======= */
+const tabButtons = document.querySelectorAll('.tab-btn');
+const tabs = {
+  config: $('tab-config'),
+  products: $('tab-products'),
+  results: $('tab-results')
+};
+
+function showTab(tabName){
+  Object.values(tabs).forEach(t => t.style.display = 'none');
+  tabButtons.forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+  if(btn) btn.classList.add('active');
+  if(tabs[tabName]) tabs[tabName].style.display = 'block';
+  if(tabName === 'results') calculateResults();
+}
+
+// attach
+tabButtons.forEach(btn=>{
+  btn.addEventListener('click', ()=> showTab(btn.dataset.tab) );
+});
+// default
+showTab('config');
+
+/* ======= INIT ======= */
+addDefaultSampleProductsIfEmpty();
+renderConfig();
+renderProducts();
+calculateResults();
+saveState();
+
+/* ======= PWA: manifest + SW (optional) ======= */
+(function createManifestAndSW(){
+  const manifest = {
+    name: "Precificação • Doceria",
+    short_name: "Precificação",
+    start_url: ".",
+    display: "standalone",
+    background_color: "#F3EAC1",
+    theme_color: "#9C7050",
+    icons: []
+  };
+  const link = document.createElement('link'); link.rel='manifest';
+  const blob = new Blob([JSON.stringify(manifest)],{type:'application/json'});
+  link.href = URL.createObjectURL(blob); document.head.appendChild(link);
+
+  if('serviceWorker' in navigator){
+    const sw = `
+      const CACHE_NAME='doceria-cache-v1';
+      const assets=['.'];
+      self.addEventListener('install', e=>{ self.skipWaiting(); e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(assets)));});
+      self.addEventListener('activate', e=> e.waitUntil(self.clients.claim()));
+      self.addEventListener('fetch', e=> {
+        if(e.request.method!=='GET') return;
+        e.respondWith(caches.match(e.request).then(r=> r || fetch(e.request)));
+      });
+    `;
+    const swBlob = new Blob([sw],{type:'application/javascript'});
+    const swUrl = URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swUrl).then(()=> console.log('SW registrado')).catch(()=>console.warn('SW erro'));
+  }
+})();
+</script>
+</body>
+</html>
