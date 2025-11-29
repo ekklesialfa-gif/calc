@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
 <title>Precificação • Doceria</title>
 <meta name="theme-color" content="#9C7050"/>
-
-<!-- Chart.js CDN -->
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
@@ -20,19 +19,21 @@
     --danger:#d9534f;
     --card-border: rgba(156,112,80,0.12);
     --radius:14px;
-    --glass: rgba(255,255,255,0.9);
     font-family: Inter, "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
   }
 
   html,body{height:100%;margin:0;background:linear-gradient(180deg,#fbf6e8,var(--cream));-webkit-font-smoothing:antialiased}
   .app{max-width:440px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding:18px 12px 100px;}
   header.app-header{
-    display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:linear-gradient(180deg,var(--glass),#fff);
-    box-shadow:0 8px 30px rgba(0,0,0,0.06);border:1px solid var(--card-border);backdrop-filter: blur(4px);
+    display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,0.85),#fff);
+    box-shadow:0 8px 30px rgba(0,0,0,0.06);border:1px solid var(--card-border);backdrop-filter: blur(6px);
     position:relative;overflow:hidden;
   }
-  .logo-wrap{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--brown),var(--gold));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.06)}
-  .logo-wrap img{width:48px;height:48px;object-fit:contain;border-radius:8px}
+
+  /* logo: show only image (no square background) */
+  .logo-wrap{width:56px;height:56px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .logo-wrap img{width:48px;height:48px;object-fit:contain;border-radius:10px;display:block}
+
   h1{font-size:16px;margin:0;color:var(--brown)}
   p.subtitle{margin:0;color:var(--muted);font-size:12px}
   main.content{margin-top:12px;flex:1;display:flex;flex-direction:column;gap:12px}
@@ -48,6 +49,7 @@
   .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
   .row{display:flex;gap:8px;align-items:center}
   .muted{color:var(--muted);font-size:13px}
+  .muted-small{color:var(--muted);font-size:12px}
   .btn{background:var(--brown);color:var(--white);padding:10px 12px;border-radius:10px;border:none;font-weight:700;cursor:pointer;transition:transform .12s, box-shadow .12s}
   .btn:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(0,0,0,0.08)}
   .btn.secondary{background:transparent;color:var(--brown);border:2px solid var(--gold)}
@@ -63,10 +65,9 @@
   .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px;border-radius:10px;color:var(--muted);font-weight:700;cursor:pointer;transition:all .18s}
   .tab-btn.active{background:linear-gradient(180deg,var(--gold),#e7cc87);color:var(--brown);transform:translateY(-6px);box-shadow:0 8px 18px rgba(0,0,0,0.08)}
   .chart-wrap{height:160px}
-  .muted-small{font-size:12px;color:var(--muted)}
   .animate-fade{animation:fadeInUp .36s both ease-out}
   @keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-  .small-ghost{font-weight:700}
+
   /* responsive tweaks */
   @media (max-width:420px){
     .app{padding:12px 10px 100px}
@@ -77,7 +78,7 @@
 <body>
   <div class="app" id="app">
     <header class="app-header">
-      <!-- Replace src with your uploaded logo path (assets/logo.png) -->
+      <!-- Use your logo file inside assets/ (example: assets/banana-canela-logo.png) -->
       <div class="logo-wrap"><img src="assets/banana-canela-logo.png" alt="Logo" id="logoImg" /></div>
       <div style="flex:1">
         <h1>Precificação • Doceria</h1>
@@ -89,10 +90,10 @@
     </header>
 
     <main class="content" id="content">
-      <!-- Config -->
+      <!-- Custos Fixos (antes Configurações) -->
       <section id="tab-config" class="card animate-fade">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <div><strong>Configurações</strong><div class="muted">Defina custos fixos, meta e canais</div></div>
+          <div><strong>Custos Fixos</strong><div class="muted">Defina custos fixos, meta e canais</div></div>
           <div><button class="small-ghost" id="btnSaveManual">Salvar</button></div>
         </div>
 
@@ -127,6 +128,36 @@
             <div class="muted" style="align-self:center">Total: <span id="distTotal">100%</span></div>
           </div>
         </div>
+
+        <!-- Mão de obra -->
+        <div style="margin-top:12px" class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>Mão de Obra</strong><div class="muted">Insira funcionários / colaboradores</div></div>
+            <div><button class="btn small" id="btnAddLabor">+ Pessoa</button></div>
+          </div>
+
+          <div style="margin-top:10px;overflow:auto">
+            <table style="width:100%;margin-top:10px" id="laborTable">
+              <thead>
+                <tr>
+                  <th style="text-align:left">Nome</th>
+                  <th style="text-align:left">Função</th>
+                  <th>R$/h</th>
+                  <th>Horas/mês</th>
+                  <th>Total/mês</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="laborTableBody"></tbody>
+            </table>
+          </div>
+
+          <div style="margin-top:12px" class="grid-2">
+            <div class="summary-box"><div class="muted-small">Total Horas/Mês</div><div class="v" id="totalHoras">0h</div></div>
+            <div class="summary-box"><div class="muted-small">Custo Hora Médio</div><div class="v" id="custoHoraMedio">R$ 0,00</div></div>
+          </div>
+        </div>
+
       </section>
 
       <!-- Produtos -->
@@ -139,21 +170,22 @@
           </div>
         </div>
 
-        <div style="margin-top:12px" id="productsContainer" class="products-list"></div>
+        <div style="margin-top:12px" id="productsContainer" class="products-list">
+          <!-- dynamic product UI will be inserted here -->
+        </div>
       </section>
 
       <!-- Resultados -->
       <section id="tab-results" class="card" style="display:none">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div><strong>Resultados</strong><div class="muted">Faturamento mínimo e vendas necessárias por produto</div></div>
-          </div>
         </div>
 
         <div style="margin-top:12px" class="summary-grid">
           <div class="summary-box"><div class="muted">Custos Fixos Totais</div><div class="v" id="fixedTotal">R$ 0,00</div></div>
           <div class="summary-box"><div class="muted">Meta Lucro</div><div class="v" id="metaVal">R$ 0,00</div></div>
           <div class="summary-box"><div class="muted">Faturamento Mínimo</div><div class="v" id="faturamentoMin">R$ 0,00</div></div>
-          <div class="summary-box"><div class="muted">Custo Hora Médio</div><div class="v" id="custoHoraMedio">R$ 0,00</div></div>
+          <div class="summary-box"><div class="muted">Custo Hora Médio</div><div class="v" id="custoHoraMedioResult">R$ 0,00</div></div>
         </div>
 
         <div style="margin-top:12px">
@@ -179,148 +211,229 @@
     </main>
 
     <nav class="footer-bar" id="footer">
-      <div class="tab-btn active" data-tab="config" id="tabbtn-config">⚙️ Config</div>
+      <div class="tab-btn active" data-tab="config" id="tabbtn-config">⚙️ Custos Fixos</div>
       <div class="tab-btn" data-tab="products" id="tabbtn-products">🍰 Produtos</div>
       <div class="tab-btn" data-tab="results" id="tabbtn-results">📊 Resultados</div>
     </nav>
   </div>
 
 <script>
-/* ========= STATE ========= */
-const STORAGE_KEY = 'doceria_precificacao_v2';
+/* ========== STATE & STORAGE ========== */
+const STORAGE_KEY = 'doceria_precificacao_v3';
 let state = {
   config:{
     aluguel:1500,energia:300,agua:30,internet:100,telefone:30,gas:110,marketing:400,taxasApps:130,
     taxaIfood:23,percVendasDiretas:70,percVendasIfood:30,absorcaoProgressiva:30,metaLucroMensal:3500
   },
   labor:[
-    {name:'Proprietário', role:'Dono', hourlyRate:12, hoursMonth:264}
+    { id: 'l1', name:'Proprietário', role:'Dono', hourlyRate:12, hoursMonth:264 }
   ],
-  products: []
+  products:[]
 };
-function loadState(){ try{ const raw = localStorage.getItem(STORAGE_KEY); if(raw) state = JSON.parse(raw); } catch(e){ console.warn(e) } }
-function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); showToast('Salvo localmente'); } catch(e){ showToast('Erro ao salvar') } }
+
+function loadState(){ try{ const r = localStorage.getItem(STORAGE_KEY); if(r) state = JSON.parse(r); } catch(e){ console.warn(e) } }
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); showToast('Salvo localmente'); } catch(e){ console.warn(e); showToast('Erro ao salvar') } }
 loadState();
 
-/* ======= HELPERS ======= */
+/* ========== HELPERS ========== */
 const $ = id => document.getElementById(id);
 function money(v){ return 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function uid(){ return 'p'+Math.random().toString(36).slice(2,9) }
+function uid(prefix='id'){ return prefix + Math.random().toString(36).slice(2,9); }
 function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
-function showToast(msg, ms=1600){
+function showToast(msg, ms=1400){
   const t = document.createElement('div'); t.textContent=msg;
-  t.style.cssText='position:fixed;right:18px;top:18px;background:var(--brown);color:#fff;padding:10px 12px;border-radius:10px;z-index:9999;font-weight:700';
+  t.style.cssText='position:fixed;right:16px;top:16px;background:var(--brown);color:#fff;padding:10px 12px;border-radius:10px;z-index:9999;font-weight:700';
   document.body.appendChild(t); setTimeout(()=>t.remove(),ms);
 }
 
-/* ======= RENDER / UI ======= */
+/* ========== RENDER UI ========== */
+
+/* Config render */
 function renderConfig(){
   const c = state.config;
-  $('aluguel').value = c.aluguel||0; $('energia').value = c.energia||0; $('agua').value = c.agua||0;
-  $('internet').value = c.internet||0; $('telefone').value = c.telefone||0; $('gas').value = c.gas||0;
-  $('marketing').value = c.marketing||0; $('taxasApps').value = c.taxasApps||0; $('taxaIfood').value = c.taxaIfood||0;
-  $('percVendasDiretas').value = c.percVendasDiretas||0; $('percVendasIfood').value = c.percVendasIfood||0;
-  $('absorcaoProgressiva').value = c.absorcaoProgressiva||0; $('metaLucroMensal').value = c.metaLucroMensal||0;
+  $('aluguel').value = c.aluguel||0;
+  $('energia').value = c.energia||0;
+  $('agua').value = c.agua||0;
+  $('internet').value = c.internet||0;
+  $('telefone').value = c.telefone||0;
+  $('gas').value = c.gas||0;
+  $('marketing').value = c.marketing||0;
+  $('taxasApps').value = c.taxasApps||0;
+  $('taxaIfood').value = c.taxaIfood||0;
+  $('percVendasDiretas').value = c.percVendasDiretas||0;
+  $('percVendasIfood').value = c.percVendasIfood||0;
+  $('absorcaoProgressiva').value = c.absorcaoProgressiva||0;
+  $('metaLucroMensal').value = c.metaLucroMensal||0;
   updateDistributionTotal();
 }
 
-function renderProducts(){
-  const tbody = document.getElementById('productsTableBody');
+/* Labor render */
+function renderLaborTable(){
+  const tbody = $('laborTableBody');
   tbody.innerHTML = '';
-
-  const avgHourlyRate = getAvgHourlyRate();
-  const absorcao = parseFloat(document.getElementById('absorcaoProgressiva').value) || 0;
-  const margemLucro = parseFloat(document.getElementById('margemLucro').value) || 0;
-  const taxaIfood = parseFloat(document.getElementById('taxaIfood').value) || 0;
-
-  products.forEach((product, index) => {
-    // CÁLCULO CORRIGIDO DE MÃO DE OBRA POR UNIDADE
-    const laborCost = (product.productionTime * avgHourlyRate) / product.unitsPerRecipe;
-
-    // CUSTO UNITÁRIO DIRETO (ingredientes + MO)
-    const costPerUnit = product.ingredientCost + laborCost;
-
-    // CUSTO POR EMBALAGEM
-    const costPerPackage = (costPerUnit * product.unitsPerPackage) + product.packagingCost;
-
-    // ABSORÇÃO PROGRESSIVA
-    const fixedCostAbsorption = costPerPackage * (absorcao / 100);
-
-    // CUSTO FINAL COM FIXOS
-    const totalCostWithFixed = costPerPackage + fixedCostAbsorption;
-
-    // PREÇOS
-    const precoDireto = totalCostWithFixed / (1 - (margemLucro / 100));
-    const precoIfood = precoDireto / (1 - (taxaIfood / 100));
-
+  state.labor.forEach((row, idx) => {
+    const total = (Number(row.hourlyRate)||0) * (Number(row.hoursMonth)||0);
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><input type="text" value="${product.name}" onchange="updateProduct(${index}, 'name', this.value)"></td>
-      <td><input type="number" value="${product.unitsPerRecipe}" onchange="updateProduct(${index}, 'unitsPerRecipe', parseInt(this.value) || 1)"></td>
-      <td><input type="number" value="${product.unitsPerPackage}" onchange="updateProduct(${index}, 'unitsPerPackage', parseInt(this.value) || 1)"></td>
-      <td><input type="number" step="0.01" value="${product.ingredientCost}" onchange="updateProduct(${index}, 'ingredientCost', parseFloat(this.value) || 0)"></td>
-      <td><input type="number" step="0.01" value="${product.packagingCost}" onchange="updateProduct(${index}, 'packagingCost', parseFloat(this.value) || 0)"></td>
-      <td><input type="number" step="0.1" value="${product.productionTime}" onchange="updateProduct(${index}, 'productionTime', parseFloat(this.value) || 0)"></td>
-      <td><input type="number" step="0.01" min="0" max="100" value="${product.participationPercent || 0}" onchange="updateProduct(${index}, 'participationPercent', parseFloat(this.value) || 0)"></td>
-      <td class="calc-cell">R$ ${laborCost.toFixed(2)}</td>
-      <td class="calc-cell">R$ ${costPerUnit.toFixed(2)}</td>
-      <td class="calc-cell">R$ ${costPerPackage.toFixed(2)}</td>
-      <td class="calc-cell">R$ ${precoDireto.toFixed(2)}</td>
-      <td class="calc-cell">R$ ${precoIfood.toFixed(2)}</td>
+      <td><input type="text" value="${row.name||''}" onchange="updateLabor('${row.id}','name',this.value)"></td>
+      <td><input type="text" value="${row.role||''}" onchange="updateLabor('${row.id}','role',this.value)"></td>
+      <td><input type="number" step="0.01" value="${row.hourlyRate||0}" onchange="updateLabor('${row.id}','hourlyRate',parseFloat(this.value)||0)"></td>
+      <td><input type="number" value="${row.hoursMonth||0}" onchange="updateLabor('${row.id}','hoursMonth',parseInt(this.value)||0)"></td>
+      <td class="calc-cell">${money(total)}</td>
+      <td><button class="small-ghost" onclick="removeLabor('${row.id}')">Remover</button></td>
     `;
     tbody.appendChild(tr);
   });
-
-  showParticipationWarning();
+  calculateLabor();
 }
 
+/* Products UI (compact table) */
+function renderProducts(){
+  const container = $('productsContainer');
+  container.innerHTML = '';
+  if(state.products.length === 0){
+    const empty = document.createElement('div'); empty.className='muted'; empty.textContent='Nenhum produto cadastrado. Clique em + Produto';
+    container.appendChild(empty); return;
+  }
+
+  state.products.forEach((p, idx) => {
+    const block = document.createElement('div'); block.className='product-row';
+    block.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div style="flex:1">
+          <div style="font-weight:800;color:var(--brown)">${p.name}</div>
+          <div class="muted-small">Rend.: ${p.unitsPerRecipe} un • Embalagem: ${p.unitsPerPackage} • Tempo: ${p.productionTime}h</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button class="small-ghost" onclick="editProduct('${p.id}')">Editar</button>
+          <button class="small-ghost" onclick="duplicateProduct('${p.id}')">Duplicar</button>
+        </div>
+      </div>
+    `;
+    container.appendChild(block);
   });
 }
 
-/* ======= SAMPLE PRODUCTS IF EMPTY ======= */
+/* Product editor modal (simple inline) */
+function editProduct(id){
+  const p = state.products.find(x=>x.id===id);
+  if(!p) return;
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#fff;border-radius:12px;padding:16px;max-width:520px;width:100%;max-height:90%;overflow:auto';
+  box.innerHTML = `
+    <h3 style="margin:0 0 10px 0;color:var(--brown)">${p.name}</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label>Nome</label><input id="ep_name" type="text" value="${p.name}"></div>
+      <div><label>Participação %</label><input id="ep_part" type="number" step="0.01" value="${p.participationPercent||0}"></div>
+      <div><label>Un/receita</label><input id="ep_unitsRecipe" type="number" value="${p.unitsPerRecipe||1}"></div>
+      <div><label>Un/embalagem</label><input id="ep_unitsPack" type="number" value="${p.unitsPerPackage||1}"></div>
+      <div><label>Custo ingredientes (R$)</label><input id="ep_ing" type="number" step="0.01" value="${p.ingredientCost||0}"></div>
+      <div><label>Custo embalagem (R$)</label><input id="ep_pack" type="number" step="0.01" value="${p.packagingCost||0}"></div>
+      <div><label>Tempo produção (h)</label><input id="ep_time" type="number" step="0.1" value="${p.productionTime||0}"></div>
+      <div><label>Margem %</label><input id="ep_margin" type="number" step="0.01" value="${p.marginPercent||state.config.margemLucro||35}"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+      <button class="btn" id="ep_save">Salvar</button>
+      <button class="small-ghost" id="ep_cancel">Cancelar</button>
+    </div>
+  `;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  $('#ep_cancel').addEventListener('click', ()=> overlay.remove());
+  $('#ep_save').addEventListener('click', ()=>{
+    p.name = $('#ep_name').value || p.name;
+    p.participationPercent = parseFloat($('#ep_part').value)||0;
+    p.unitsPerRecipe = parseInt($('#ep_unitsRecipe').value)||1;
+    p.unitsPerPackage = parseInt($('#ep_unitsPack').value)||1;
+    p.ingredientCost = parseFloat($('#ep_ing').value)||0;
+    p.packagingCost = parseFloat($('#ep_pack').value)||0;
+    p.productionTime = parseFloat($('#ep_time').value)||0;
+    p.marginPercent = parseFloat($('#ep_margin').value)|| (p.marginPercent||35);
+    saveState(); renderProducts(); calculateResults();
+    overlay.remove();
+  });
+}
+
+function duplicateProduct(id){
+  const p = state.products.find(x=>x.id===id);
+  if(!p) return;
+  const copy = JSON.parse(JSON.stringify(p));
+  copy.id = uid('p');
+  copy.name = copy.name + ' (copy)';
+  state.products.push(copy);
+  saveState(); renderProducts(); calculateResults();
+}
+
+/* ========== SAMPLE PRODUCTS ========== */
 function addDefaultSampleProductsIfEmpty(){
-  if(state.products.length===0){
-    state.products.push({id:uid(),name:'Alfajor Maizena (caixa 6)',unitsPerRecipe:36,unitsPerPackage:6,ingredientCost:11.71,packagingCost:1.20,productionTimeHours:2,participationPercent:40,marginPercent:35});
-    state.products.push({id:uid(),name:'Brownie (un)',unitsPerRecipe:6,unitsPerPackage:1,ingredientCost:24.42,packagingCost:1.00,productionTimeHours:1,participationPercent:30,marginPercent:35});
-    state.products.push({id:uid(),name:'Cookie recheado (90g)',unitsPerRecipe:8,unitsPerPackage:1,ingredientCost:36.23,packagingCost:1.00,productionTimeHours:1.5,participationPercent:30,marginPercent:35});
+  if(state.products.length === 0){
+    state.products.push({ id: uid('p'), name:'Alfajor Maizena (caixa 6)', unitsPerRecipe:36, unitsPerPackage:6, ingredientCost:11.71, packagingCost:1.20, productionTime:2, participationPercent:40, marginPercent:35 });
+    state.products.push({ id: uid('p'), name:'Brownie (un)', unitsPerRecipe:6, unitsPerPackage:1, ingredientCost:24.42, packagingCost:1.00, productionTime:1, participationPercent:30, marginPercent:35 });
+    state.products.push({ id: uid('p'), name:'Cookie recheado (90g)', unitsPerRecipe:8, unitsPerPackage:1, ingredientCost:36.23, packagingCost:1.00, productionTime:1.5, participationPercent:30, marginPercent:35 });
     saveState();
   }
 }
 
-/* ======= CALCS ======= */
-function getLaborTotals(){ let totalHours=0, totalCost=0; state.labor.forEach(l=>{ totalHours += Number(l.hoursMonth||0); totalCost += Number(l.hourlyRate||0) * Number(l.hoursMonth||0); }); return { totalHours, totalCost }; }
-function getFixedCostsOperational(){ const c = state.config; const fields = ['aluguel','energia','agua','internet','telefone','gas','marketing','taxasApps']; let sum=0; fields.forEach(f=> sum+=Number(c[f]||0)); return sum; }
-function getFixedCostsTotal(){ return getFixedCostsOperational() + getLaborTotals().totalCost; }
+/* ========== CALCULATIONS ========== */
 
-function calculatePerProduct(product){
-  const labor = getLaborTotals();
-  const avgHourly = labor.totalHours>0 ? labor.totalCost / labor.totalHours : 0;
-  const productionTime = Number(product.productionTimeHours||0);
-  const laborCostRecipe = productionTime * avgHourly;
-  const costPerUnitIngredients = Number(product.ingredientCost||0) / (Number(product.unitsPerRecipe)||1);
-  const costPerUnitLabor = laborCostRecipe / (Number(product.unitsPerRecipe)||1);
-  const costPerUnit = costPerUnitIngredients + costPerUnitLabor;
-  const costPerPackage = (costPerUnit * (product.unitsPerPackage||1)) + Number(product.packagingCost||0);
+/* labor totals */
+function getLaborTotals(){
+  let totalHours=0, totalCost=0;
+  state.labor.forEach(l=>{
+    totalHours += Number(l.hoursMonth||0);
+    totalCost += (Number(l.hourlyRate)||0) * (Number(l.hoursMonth)||0);
+  });
+  return { totalHours, totalCost };
+}
 
+/* fixed costs (operational) */
+function getFixedCostsOperational(){
+  const c = state.config;
+  const fields = ['aluguel','energia','agua','internet','telefone','gas','marketing','taxasApps'];
+  let sum = 0;
+  fields.forEach(f=> sum += Number(c[f]||0));
+  return sum;
+}
+function getFixedCostsTotal(){
+  return getFixedCostsOperational() + getLaborTotals().totalCost;
+}
+
+/* calculating for each product (used for charts and results) */
+function calculatePerProduct(p){
+  // normalize property names compatibility
+  const unitsPerRecipe = Number(p.unitsPerRecipe||p.unitsPerRecipe===0? p.unitsPerRecipe : 1);
+  const unitsPerPackage = Number(p.unitsPerPackage||1);
+  const ingredientCost = Number(p.ingredientCost||0);
+  const packagingCost = Number(p.packagingCost||0);
+  // labor
+  const laborTotals = getLaborTotals();
+  const avgHourly = laborTotals.totalHours > 0 ? laborTotals.totalCost / laborTotals.totalHours : 0;
+  const productionTime = Number(p.productionTime||0);
+  // labor cost per unit = (productionTime * avgHourly) / unitsPerRecipe
+  const laborCostPerUnit = unitsPerRecipe > 0 ? (productionTime * avgHourly) / unitsPerRecipe : 0;
+  const costPerUnit = ingredientCost + laborCostPerUnit;
+  const costPerPackage = (costPerUnit * unitsPerPackage) + packagingCost;
   const absorcaoPct = Number(state.config.absorcaoProgressiva||0)/100;
   const fixedCostAbsorption = costPerPackage * absorcaoPct;
   const totalCostWithFixed = costPerPackage + fixedCostAbsorption;
-
-  const marginPct = Number(product.marginPercent||state.config.margemLucro||0)/100;
+  const marginPct = Number(p.marginPercent || state.config.margemLucro || 0)/100;
   const precoDireto = marginPct < 0.999 ? totalCostWithFixed / (1 - marginPct) : totalCostWithFixed;
   const taxaIfood = Number(state.config.taxaIfood||0)/100;
   const precoIfood = precoDireto / (1 - taxaIfood);
-
   const precoMarkup3 = costPerPackage * 3;
-  const cmv = precoDireto>0 ? (costPerPackage / precoDireto) * 100 : 0;
+  const cmv = precoDireto > 0 ? (costPerPackage / precoDireto) * 100 : 0;
   const margemUnitaria = precoDireto - totalCostWithFixed;
-
-  return { avgHourly, costPerUnit, costPerPackage, fixedCostAbsorption, totalCostWithFixed, precoDireto, precoIfood, precoMarkup3, cmv, margemUnitaria, laborCostRecipe };
+  return { unitsPerRecipe, unitsPerPackage, ingredientCost, packagingCost, laborCostPerUnit, costPerUnit, costPerPackage, fixedCostAbsorption, totalCostWithFixed, precoDireto, precoIfood, precoMarkup3, cmv, margemUnitaria };
 }
 
-/* ======= RESULTS ======= */
-let participationChart=null, cmvChart=null;
+/* ========== RESULTS & CHARTS ========== */
+let participationChart = null, cmvChart = null;
+
 function calculateResults(){
+  // fixed total
   const fixedTotal = getFixedCostsTotal();
   const metaLucro = Number(state.config.metaLucroMensal||0);
   const faturamentoMin = fixedTotal + metaLucro;
@@ -328,14 +441,14 @@ function calculateResults(){
   $('metaVal').textContent = money(metaLucro);
   $('faturamentoMin').textContent = money(faturamentoMin);
 
+  // avg hourly
   const labor = getLaborTotals();
-  const avgHourly = labor.totalHours>0 ? labor.totalCost / labor.totalHours : 0;
-  $('custoHoraMedio').textContent = money(avgHourly);
+  const avgHourly = labor.totalHours > 0 ? labor.totalCost / labor.totalHours : 0;
+  $('custoHoraMedioResult').textContent = money(avgHourly);
 
-  // compute distribution
+  // quantity / per product
   const qdiv = $('qtdResult'); qdiv.innerHTML = '';
-  let totalParticipation = 0; state.products.forEach(p=> totalParticipation += Number(p.participationPercent||0));
-
+  let totalParticipation = 0; state.products.forEach(pp=> totalParticipation += Number(pp.participationPercent||0));
   if(totalParticipation <= 0){
     qdiv.innerHTML = '<div class="muted">Defina as % de participação dos produtos para calcular distribuição.</div>';
   } else {
@@ -344,8 +457,8 @@ function calculateResults(){
       warn.innerHTML = `⚠️ A soma das participações = ${totalParticipation.toFixed(1)}%. (use "Normalizar %" para ajustar)`;
       qdiv.appendChild(warn);
     }
-    // charts data
-    const labels = []; const dataPct = []; const dataCMV = [];
+
+    const labels = [], dataPct = [], dataCMV = [];
 
     state.products.forEach(p=>{
       const calc = calculatePerProduct(p);
@@ -353,57 +466,54 @@ function calculateResults(){
       const faturamentoProduto = faturamentoMin * (particip/100);
       const qtdNecessaria = calc.margemUnitaria > 0 ? Math.ceil(faturamentoProduto / calc.margemUnitaria) : 0;
 
-      const box = document.createElement('div'); box.className='product-row';
-      box.style.display='flex'; box.style.flexDirection='column';
-      const line1 = document.createElement('div'); line1.style.display='flex'; line1.style.justifyContent='space-between';
-      line1.innerHTML = `<div style="font-weight:800;color:var(--brown)">${p.name}</div><div class="pill">${particip.toFixed(1)}%</div>`;
-      const line2 = document.createElement('div'); line2.style.display='flex'; line2.style.justifyContent='space-between'; line2.style.marginTop='8px';
-      line2.innerHTML = `<div class="muted">Preço Direto: <strong>${money(calc.precoDireto)}</strong> • iFood: <strong>${money(calc.precoIfood)}</strong></div>
-                         <div style="text-align:right"><div class="muted">CMV ${calc.cmv.toFixed(1)}%</div><div style="font-weight:800">${qtdNecessaria} un/mês</div></div>`;
-      box.appendChild(line1); box.appendChild(line2);
-      qdiv.appendChild(box);
+      // item block
+      const item = document.createElement('div'); item.className='product-row';
+      item.style.display='flex'; item.style.flexDirection='column';
+      item.innerHTML = `<div style="display:flex;justify-content:space-between"><div style="font-weight:800;color:var(--brown)">${p.name}</div><div class="pill">${particip.toFixed(1)}%</div></div>
+                        <div style="display:flex;justify-content:space-between;margin-top:8px">
+                          <div class="muted-small">Preço Direto: <strong>${money(calc.precoDireto)}</strong> • iFood: <strong>${money(calc.precoIfood)}</strong></div>
+                          <div style="text-align:right"><div class="muted-small">CMV ${calc.cmv.toFixed(1)}%</div><div style="font-weight:800">${qtdNecessaria} un/mês</div></div>
+                        </div>`;
+      qdiv.appendChild(item);
 
       labels.push(p.name);
       dataPct.push(particip);
       dataCMV.push(calc.cmv);
     });
+
     updateCharts(labels, dataPct, dataCMV);
   }
 
-  // update comparatives
-  $('displayPercDiretas').textContent = Number(state.config.percVendasDiretas||0);
-  $('displayPercIfood').textContent = Number(state.config.percVendasIfood||0);
-  const boxDireto = $('boxDireto'); const boxIfood = $('boxIfood');
-  if(boxDireto) boxDireto.innerHTML = `<div class="muted">Estimativa faturamento canal</div><div style="font-weight:800;margin-top:6px">${money(faturamentoMin * (state.config.percVendasDiretas/100))}</div>`;
-  if(boxIfood) boxIfood.innerHTML = `<div class="muted">Estimativa faturamento canal</div><div style="font-weight:800;margin-top:6px">${money(faturamentoMin * (state.config.percVendasIfood/100))}</div>`;
+  // update comparatives small (if present)
+  // (we don't render separate boxes now - kept calculation)
 }
 
-/* ======= CHARTS ======= */
+/* chart render */
 function updateCharts(labels, dataPct, dataCMV){
   const ctx = $('participChart').getContext('2d');
   const ctx2 = $('cmvChart').getContext('2d');
-
   if(participationChart) participationChart.destroy();
   participationChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: { labels: labels, datasets: [{ data: dataPct, backgroundColor: generateColors(labels.length) }] },
-    options: { plugins:{legend:{display:false}}, maintainAspectRatio:false }
+    type:'doughnut',
+    data:{ labels, datasets:[{ data: dataPct, backgroundColor: generateColors(labels.length) }]},
+    options:{ plugins:{legend:{display:true, position:'bottom'}}, maintainAspectRatio:false }
   });
 
   if(cmvChart) cmvChart.destroy();
   cmvChart = new Chart(ctx2, {
-    type: 'bar',
-    data: { labels: labels, datasets: [{ label: 'CMV %', data: dataCMV, backgroundColor: generateColors(labels.length) }] },
-    options: { plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}, maintainAspectRatio:false }
+    type:'bar',
+    data:{ labels, datasets:[{ label:'CMV %', data: dataCMV, backgroundColor: generateColors(labels.length) }]},
+    options:{ plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}, maintainAspectRatio:false }
   });
 }
-
 function generateColors(n){
-  const palette = ['#C8AD57','#9C7050','#F2D9A7','#E3C89A','#D8B77C','#EEDFC8','#B78A60'];
-  const out = []; for(let i=0;i<n;i++) out.push(palette[i%palette.length]); return out;
+  const p = ['#C8AD57','#9C7050','#F2D9A7','#E3C89A','#D8B77C','#EEDFC8','#B78A60','#F7E6C1'];
+  const out=[]; for(let i=0;i<n;i++) out.push(p[i%p.length]); return out;
 }
 
-/* ======= UI EVENTS ======= */
+/* ========== UI EVENTS & Interactions ========== */
+
+/* update state from UI (costs) */
 function updateStateFromUI(){
   const c = state.config;
   c.aluguel = Number($('aluguel').value||0);
@@ -422,41 +532,68 @@ function updateStateFromUI(){
   saveState(); updateDistributionTotal();
 }
 
+/* distribution total display */
 function updateDistributionTotal(){
-  const a = Number($('percVendasDiretas').value||0); const b = Number($('percVendasIfood').value||0);
+  const a = Number($('percVendasDiretas').value||0);
+  const b = Number($('percVendasIfood').value||0);
   $('distTotal').textContent = (a+b).toFixed(1) + '%';
 }
 
-function updateAll(){ saveState(); renderProducts(); calculateResults(); }
+/* labor manipulation */
+function addLabor(){
+  state.labor.push({ id: uid('l'), name:'Novo', role:'', hourlyRate:0, hoursMonth:0});
+  saveState(); renderLaborTable(); renderConfig(); calculateResults();
+}
+function updateLabor(id, field, value){
+  const r = state.labor.find(x=>x.id===id);
+  if(!r) return;
+  r[field] = value;
+  saveState(); renderLaborTable(); calculateResults();
+}
+function removeLabor(id){
+  state.labor = state.labor.filter(x=>x.id!==id);
+  saveState(); renderLaborTable(); calculateResults();
+}
 
-/* buttons */
-$('btnAddProduct').addEventListener('click', ()=> {
-  const newP = { id:uid(), name:'Novo Produto', unitsPerRecipe:1, unitsPerPackage:1, ingredientCost:0, packagingCost:0, productionTimeHours:0.5, participationPercent:0, marginPercent:35 };
-  state.products.push(newP); saveState(); renderProducts(); calculateResults();
-});
-$('btnNormalize').addEventListener('click', ()=> {
-  let sum=0; state.products.forEach(p=> sum += Number(p.participationPercent||0));
-  if(sum === 0){ showToast('Soma zero — atribua % antes de normalizar'); return; }
-  state.products.forEach(p=> p.participationPercent = (Number(p.participationPercent||0) / sum) * 100);
+/* products manipulation */
+function addProduct(){
+  if(state.products.length >= 20){ showToast('Limite 20 produtos atingido'); return; }
+  const p = { id: uid('p'), name:'Novo Produto', unitsPerRecipe:1, unitsPerPackage:1, ingredientCost:0, packagingCost:0, productionTime:0.5, participationPercent:0, marginPercent:35 };
+  state.products.push(p); saveState(); renderProducts(); calculateResults();
+}
+function removeProduct(id){
+  state.products = state.products.filter(x=>x.id!==id);
   saveState(); renderProducts(); calculateResults();
-});
-$('btnSaveManual').addEventListener('click', ()=> { updateStateFromUI(); showToast('Config salva'); });
-$('btnReset').addEventListener('click', ()=> { if(confirm('Resetar dados locais?')){ localStorage.removeItem(STORAGE_KEY); location.reload(); } });
+}
+function normalizePercents(){
+  let sum = 0; state.products.forEach(p=> sum += Number(p.participationPercent||0));
+  if(sum === 0) { showToast('Soma zero — atribua % antes de normalizar'); return; }
+  state.products.forEach(p=> p.participationPercent = (Number(p.participationPercent||0)/sum)*100 );
+  saveState(); renderProducts(); calculateResults();
+}
 
-/* live inputs */
+/* small product table editing is in modal 'editProduct' above */
+
+/* event listeners for buttons */
+document.getElementById('btnAddLabor').addEventListener('click', addLabor);
+document.getElementById('btnAddProduct').addEventListener('click', addProduct);
+document.getElementById('btnNormalize').addEventListener('click', normalizePercents);
+document.getElementById('btnSaveManual').addEventListener('click', ()=>{ updateStateFromUI(); showToast('Config salva'); });
+document.getElementById('btnReset').addEventListener('click', ()=>{ if(confirm('Resetar dados locais?')){ localStorage.removeItem(STORAGE_KEY); location.reload(); } });
+
+/* live update inputs */
 ['aluguel','energia','agua','internet','telefone','gas','marketing','taxasApps','taxaIfood','percVendasDiretas','percVendasIfood','absorcaoProgressiva','metaLucroMensal'].forEach(id=>{
   const el = $(id); if(!el) return;
   el.addEventListener('input', ()=>{ updateStateFromUI(); calculateResults(); });
 });
 
-/* ======= TAB NAV (clean single implementation) ======= */
+/* TAB NAV */
 const tabButtons = document.querySelectorAll('.tab-btn');
 const tabs = {
   config: $('tab-config'),
   products: $('tab-products'),
   results: $('tab-results')
 };
-
 function showTab(tabName){
   Object.values(tabs).forEach(t => t.style.display = 'none');
   tabButtons.forEach(b => b.classList.remove('active'));
@@ -465,52 +602,17 @@ function showTab(tabName){
   if(tabs[tabName]) tabs[tabName].style.display = 'block';
   if(tabName === 'results') calculateResults();
 }
-
-// attach
-tabButtons.forEach(btn=>{
-  btn.addEventListener('click', ()=> showTab(btn.dataset.tab) );
-});
-// default
+tabButtons.forEach(btn=> btn.addEventListener('click', ()=> showTab(btn.dataset.tab) ) );
 showTab('config');
 
-/* ======= INIT ======= */
+/* ========== INIT ========== */
 addDefaultSampleProductsIfEmpty();
 renderConfig();
+renderLaborTable();
 renderProducts();
 calculateResults();
 saveState();
 
-/* ======= PWA: manifest + SW (optional) ======= */
-(function createManifestAndSW(){
-  const manifest = {
-    name: "Precificação • Doceria",
-    short_name: "Precificação",
-    start_url: ".",
-    display: "standalone",
-    background_color: "#F3EAC1",
-    theme_color: "#9C7050",
-    icons: []
-  };
-  const link = document.createElement('link'); link.rel='manifest';
-  const blob = new Blob([JSON.stringify(manifest)],{type:'application/json'});
-  link.href = URL.createObjectURL(blob); document.head.appendChild(link);
-
-  if('serviceWorker' in navigator){
-    const sw = `
-      const CACHE_NAME='doceria-cache-v1';
-      const assets=['.'];
-      self.addEventListener('install', e=>{ self.skipWaiting(); e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(assets)));});
-      self.addEventListener('activate', e=> e.waitUntil(self.clients.claim()));
-      self.addEventListener('fetch', e=> {
-        if(e.request.method!=='GET') return;
-        e.respondWith(caches.match(e.request).then(r=> r || fetch(e.request)));
-      });
-    `;
-    const swBlob = new Blob([sw],{type:'application/javascript'});
-    const swUrl = URL.createObjectURL(swBlob);
-    navigator.serviceWorker.register(swUrl).then(()=> console.log('SW registrado')).catch(()=>console.warn('SW erro'));
-  }
-})();
 </script>
 </body>
 </html>
