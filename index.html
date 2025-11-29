@@ -228,47 +228,56 @@ function renderConfig(){
 }
 
 function renderProducts(){
-  const container = $('productsContainer'); container.innerHTML = '';
-  if(state.products.length === 0){
-    const empty = document.createElement('div'); empty.className='muted'; empty.textContent='Nenhum produto cadastrado. Clique em + Produto';
-    container.appendChild(empty); return;
-  }
+  function renderProducts() {
+  const tbody = document.getElementById('productsTableBody');
+  tbody.innerHTML = '';
 
-  state.products.forEach((p, idx) => {
-    const row = document.createElement('div'); row.className='product-row animate-fade';
-    const top = document.createElement('div'); top.style.display='flex'; top.style.justifyContent='space-between'; top.style.alignItems='center';
-    const left = document.createElement('div');
-    const nameIn = document.createElement('input'); nameIn.type='text'; nameIn.value = p.name; nameIn.addEventListener('change', e=> { p.name = e.target.value || 'Produto'; saveState(); renderProducts(); });
-    left.appendChild(nameIn);
+  const avgHourlyRate = getAvgHourlyRate();
+  const absorcao = parseFloat(document.getElementById('absorcaoProgressiva').value) || 0;
+  const margemLucro = parseFloat(document.getElementById('margemLucro').value) || 0;
+  const taxaIfood = parseFloat(document.getElementById('taxaIfood').value) || 0;
 
-    const rightActions = document.createElement('div');
-    const btnDup = document.createElement('button'); btnDup.className='small-ghost'; btnDup.textContent='Duplicar'; btnDup.onclick = ()=>{ const copy = JSON.parse(JSON.stringify(p)); copy.id = uid(); state.products.push(copy); saveState(); renderProducts(); updateAll(); }
-    const btnDel = document.createElement('button'); btnDel.className='small-ghost'; btnDel.textContent='Remover'; btnDel.onclick = ()=>{ if(confirm('Remover produto?')){ state.products.splice(idx,1); saveState(); renderProducts(); updateAll(); } }
-    rightActions.appendChild(btnDup); rightActions.appendChild(btnDel);
+  products.forEach((product, index) => {
+    // CÁLCULO CORRIGIDO DE MÃO DE OBRA POR UNIDADE
+    const laborCost = (product.productionTime * avgHourlyRate) / product.unitsPerRecipe;
 
-    top.appendChild(left); top.appendChild(rightActions);
+    // CUSTO UNITÁRIO DIRETO (ingredientes + MO)
+    const costPerUnit = product.ingredientCost + laborCost;
 
-    // inputs grid
-    const grid = document.createElement('div'); grid.style.display='grid'; grid.style.gridTemplateColumns='1fr 1fr'; grid.style.gap='8px'; grid.style.marginTop='8px';
-    const c1 = document.createElement('div'); c1.innerHTML = '<label>Rend. por receita (un)</label>'; const inpUnits = document.createElement('input'); inpUnits.type='number'; inpUnits.value = p.unitsPerRecipe||1; inpUnits.addEventListener('change', e=>{ p.unitsPerRecipe = parseInt(e.target.value)||1; saveState(); updateAll(); }); c1.appendChild(inpUnits);
-    const c2 = document.createElement('div'); c2.innerHTML = '<label>Unidades/embalagem</label>'; const inpPack = document.createElement('input'); inpPack.type='number'; inpPack.value = p.unitsPerPackage||1; inpPack.addEventListener('change', e=>{ p.unitsPerPackage = parseInt(e.target.value)||1; saveState(); updateAll(); }); c2.appendChild(inpPack);
-    const c3 = document.createElement('div'); c3.innerHTML = '<label>Custo ingredientes (R$)</label>'; const inpIngr = document.createElement('input'); inpIngr.type='number'; inpIngr.step='0.01'; inpIngr.value = p.ingredientCost||0; inpIngr.addEventListener('change', e=>{ p.ingredientCost = parseFloat(e.target.value)||0; saveState(); updateAll(); }); c3.appendChild(inpIngr);
-    const c4 = document.createElement('div'); c4.innerHTML = '<label>Custo embalagem (R$)</label>'; const inpPackCost = document.createElement('input'); inpPackCost.type='number'; inpPackCost.step='0.01'; inpPackCost.value = p.packagingCost||0; inpPackCost.addEventListener('change', e=>{ p.packagingCost = parseFloat(e.target.value)||0; saveState(); updateAll(); }); c4.appendChild(inpPackCost);
-    const c5 = document.createElement('div'); c5.innerHTML = '<label>Tempo produção (h)</label>'; const inpTime = document.createElement('input'); inpTime.type='number'; inpTime.step='0.1'; inpTime.value = p.productionTimeHours||0.5; inpTime.addEventListener('change', e=>{ p.productionTimeHours = parseFloat(e.target.value)||0; saveState(); updateAll(); }); c5.appendChild(inpTime);
-    const c6 = document.createElement('div'); c6.innerHTML = '<label>% Participação no faturamento</label>'; const inpPct = document.createElement('input'); inpPct.type='number'; inpPct.step='0.1'; inpPct.value = p.participationPercent||0; inpPct.addEventListener('change', e=>{ p.participationPercent = clamp(parseFloat(e.target.value)||0,0,100); saveState(); updateAll(); renderProducts(); }); c6.appendChild(inpPct);
-    const c7 = document.createElement('div'); c7.innerHTML = '<label>% Margem (venda direta)</label>'; const inpMargin = document.createElement('input'); inpMargin.type='number'; inpMargin.step='0.1'; inpMargin.value = p.marginPercent||state.config.margemLucro||35; inpMargin.addEventListener('change', e=>{ p.marginPercent = clamp(parseFloat(e.target.value)||0,0,99); saveState(); updateAll(); }); c7.appendChild(inpMargin);
+    // CUSTO POR EMBALAGEM
+    const costPerPackage = (costPerUnit * product.unitsPerPackage) + product.packagingCost;
 
-    grid.appendChild(c1); grid.appendChild(c2);
-    grid.appendChild(c3); grid.appendChild(c4);
-    grid.appendChild(c5); grid.appendChild(c6);
-    grid.appendChild(c7);
+    // ABSORÇÃO PROGRESSIVA
+    const fixedCostAbsorption = costPerPackage * (absorcao / 100);
 
-    // small help
-    const help = document.createElement('div'); help.className='muted-small'; help.style.marginTop='8px';
-    help.textContent = `ingred: ${p.ingredientCost} • embal: ${p.packagingCost} • tempo: ${p.productionTimeHours}h • %: ${p.participationPercent||0} • margem: ${p.marginPercent||state.config.margemLucro}`;
+    // CUSTO FINAL COM FIXOS
+    const totalCostWithFixed = costPerPackage + fixedCostAbsorption;
 
-    row.appendChild(top); row.appendChild(grid); row.appendChild(help);
-    container.appendChild(row);
+    // PREÇOS
+    const precoDireto = totalCostWithFixed / (1 - (margemLucro / 100));
+    const precoIfood = precoDireto / (1 - (taxaIfood / 100));
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="${product.name}" onchange="updateProduct(${index}, 'name', this.value)"></td>
+      <td><input type="number" value="${product.unitsPerRecipe}" onchange="updateProduct(${index}, 'unitsPerRecipe', parseInt(this.value) || 1)"></td>
+      <td><input type="number" value="${product.unitsPerPackage}" onchange="updateProduct(${index}, 'unitsPerPackage', parseInt(this.value) || 1)"></td>
+      <td><input type="number" step="0.01" value="${product.ingredientCost}" onchange="updateProduct(${index}, 'ingredientCost', parseFloat(this.value) || 0)"></td>
+      <td><input type="number" step="0.01" value="${product.packagingCost}" onchange="updateProduct(${index}, 'packagingCost', parseFloat(this.value) || 0)"></td>
+      <td><input type="number" step="0.1" value="${product.productionTime}" onchange="updateProduct(${index}, 'productionTime', parseFloat(this.value) || 0)"></td>
+      <td><input type="number" step="0.01" min="0" max="100" value="${product.participationPercent || 0}" onchange="updateProduct(${index}, 'participationPercent', parseFloat(this.value) || 0)"></td>
+      <td class="calc-cell">R$ ${laborCost.toFixed(2)}</td>
+      <td class="calc-cell">R$ ${costPerUnit.toFixed(2)}</td>
+      <td class="calc-cell">R$ ${costPerPackage.toFixed(2)}</td>
+      <td class="calc-cell">R$ ${precoDireto.toFixed(2)}</td>
+      <td class="calc-cell">R$ ${precoIfood.toFixed(2)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  showParticipationWarning();
+}
+
   });
 }
 
