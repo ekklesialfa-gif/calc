@@ -84,7 +84,6 @@
         <p class="subtitle">Calc. CMV · Markup 3× · iFood · Offline</p>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="btn small" id="btnExportCSV">Exportar CSV</button>
         <button class="btn small secondary" id="btnReset">Reset</button>
       </div>
     </header>
@@ -147,8 +146,6 @@
       <section id="tab-results" class="card" style="display:none">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div><strong>Resultados</strong><div class="muted">Faturamento mínimo e vendas necessárias por produto</div></div>
-          <div class="csv-actions">
-            <button class="btn small" id="btnCSVDownload">Download CSV</button>
           </div>
         </div>
 
@@ -446,39 +443,6 @@ $('btnNormalize').addEventListener('click', ()=> {
 });
 $('btnSaveManual').addEventListener('click', ()=> { updateStateFromUI(); showToast('Config salva'); });
 $('btnReset').addEventListener('click', ()=> { if(confirm('Resetar dados locais?')){ localStorage.removeItem(STORAGE_KEY); location.reload(); } });
-
-/* CSV export */
-function generateCSV(){
-  const rows = [['Produto','Campo','Valor']];
-  state.products.forEach(p => {
-    const calc = calculatePerProduct(p);
-    rows.push([p.name,'Unidades por receita',p.unitsPerRecipe]);
-    rows.push([p.name,'Unidades por embalagem',p.unitsPerPackage]);
-    rows.push([p.name,'Custo ingredientes (R$)',(p.ingredientCost||0).toFixed(2)]);
-    rows.push([p.name,'Custo embalagem (R$)',(p.packagingCost||0).toFixed(2)]);
-    rows.push([p.name,'Tempo produção (h)',(p.productionTimeHours||0).toFixed(2)]);
-    rows.push([p.name,'% participação',(p.participationPercent||0).toFixed(2)+'%']);
-    rows.push([p.name,'Custo unitário total (R$)',calc.totalCostWithFixed.toFixed(2)]);
-    rows.push([p.name,'Preço venda direta (R$)',calc.precoDireto.toFixed(2)]);
-    rows.push([p.name,'Preço venda iFood (R$)',calc.precoIfood.toFixed(2)]);
-    rows.push([p.name,'CMV (%)',calc.cmv.toFixed(2)+'%']);
-  });
-  return rows.map(r => r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-}
-$('btnExportCSV').addEventListener('click', ()=> {
-  const csv = generateCSV();
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(csv).then(()=> showToast('CSV copiado (cole no Sheets).'));
-  } else {
-    const ta = document.createElement('textarea'); ta.value = csv; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); showToast('CSV copiado (cole no Sheets).');
-  }
-});
-$('btnCSVDownload').addEventListener('click', ()=>{
-  const csv = generateCSV();
-  const blob = new Blob(['\uFEFF',csv], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'precificacao_doceria.csv'; a.click(); URL.revokeObjectURL(url); showToast('CSV baixado.');
-});
 
 /* live inputs */
 ['aluguel','energia','agua','internet','telefone','gas','marketing','taxasApps','taxaIfood','percVendasDiretas','percVendasIfood','absorcaoProgressiva','metaLucroMensal'].forEach(id=>{
