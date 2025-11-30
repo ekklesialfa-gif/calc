@@ -98,10 +98,10 @@ input[type="number"], input[type="text"], select, textarea{
 
         <div style="margin-top:12px">
           <label>Distribuição de canais (modifique para simular)</label>
-           <div style="display:flex; gap:8px; margin-top:6px; width:100%;">
+           <div class="dist-wrapper">
     
     <!-- Coluna Venda Direta -->
-    <div style="display:flex; flex-direction:column; width:40%;">
+    <div class="dist-col">
       <label style="font-size:13px; margin-bottom:4px;">Venda direta</label>
       <input id="percVendasDiretas" type="number" value="0" />
     </div>
@@ -113,7 +113,7 @@ input[type="number"], input[type="text"], select, textarea{
     </div>
 
     <!-- Total -->
-    <div class="muted" style="align-self:end; margin-bottom:4px;">
+    <div class="dist-total muted">
       Total: <span id="distTotal">0%</span>
     </div>
           </div>
@@ -200,6 +200,43 @@ input[type="number"], input[type="text"], select, textarea{
 
   <!-- Product Modal (hidden until used) -->
   <div id="modalRoot" style="display:none"></div>
+/* Desktop */
+.dist-wrapper {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  width: 100%;
+}
+
+.dist-col {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+}
+
+.dist-col label {
+  margin-bottom: 4px;
+}
+
+.dist-total {
+  align-self: center;
+  white-space: nowrap;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .dist-wrapper {
+    flex-direction: column;
+  }
+
+  .dist-col {
+    width: 100%;
+  }
+
+  .dist-total {
+    align-self: flex-start;
+    margin-top: -4px;
+  }
 
 <script>
 /* =========================
