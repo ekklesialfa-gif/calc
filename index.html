@@ -98,10 +98,24 @@ input[type="number"], input[type="text"], select, textarea{
 
         <div style="margin-top:12px">
           <label>Distribuição de canais (modifique para simular)</label>
-          <div style="display:flex;gap:8px;margin-top:6px">
-            <input id="percVendasDiretas" type="number" value="0" style="width:40%" />
-            <input id="percVendasIfood" type="number" value="0" style="width:40%" />
-            <div class="muted" style="align-self:center">Total: <span id="distTotal">0%</span></div>
+           <div style="display:flex; gap:8px; margin-top:6px; width:100%;">
+    
+    <!-- Coluna Venda Direta -->
+    <div style="display:flex; flex-direction:column; width:40%;">
+      <label style="font-size:13px; margin-bottom:4px;">Venda direta</label>
+      <input id="percVendasDiretas" type="number" value="0" />
+    </div>
+
+    <!-- Coluna iFood -->
+    <div style="display:flex; flex-direction:column; width:40%;">
+      <label style="font-size:13px; margin-bottom:4px;">iFood</label>
+      <input id="percVendasIfood" type="number" value="0" />
+    </div>
+
+    <!-- Total -->
+    <div class="muted" style="align-self:end; margin-bottom:4px;">
+      Total: <span id="distTotal">0%</span>
+    </div>
           </div>
         </div>
 
