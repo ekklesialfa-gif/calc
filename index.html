@@ -518,6 +518,448 @@ function calculatePerProduct(product){
   const totalCostWithFixed = costPerPackage + fixedCostAbsorption;
 
   const marginPct = Number(product.marginPercent||0) / 100;
+ <!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
+<title>Precificação • Doceria</title>
+<meta name="theme-color" content="#C9A86A" />
+<!-- Chart.js para gráficos -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+/* ===== Paleta B: moderna neutra + dourado ===== */
+:root{
+  --bg:#FFFFFF;
+  --surface:#F4F5F7;
+  --muted:#6B7280;
+  --text:#111827;
+  --accent:#C9A86A; /* dourado suave */
+  --accent-2:#E5D5B5; /* creme */
+  --card-border: rgba(17,24,39,0.06);
+  --radius:12px;
+  font-family: Inter, "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* Reset e layout */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--accent-2),var(--surface));color:var(--text)}
+.app{max-width:920px;margin:14px auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+
+/* Header */
+.header{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;background:linear-gradient(180deg,var(--bg),#fff);border:1px solid var(--card-border);box-shadow:0 8px 24px rgba(17,24,39,0.04)}
+.logo-wrap{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#D4B679,var(--accent));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-wrap img{width:44px;height:44px;object-fit:contain;border-radius:8px}
+.title-block{flex:1}
+h1{margin:0;font-size:18px}
+.subtitle{margin:0;color:var(--muted);font-size:13px}
+
+/* Container / Cards */
+.container{display:grid;grid-template-columns:1fr;gap:12px}
+.card{background:var(--bg);padding:14px;border-radius:12px;border:1px solid var(--card-border);box-shadow:0 8px 22px rgba(17,24,39,0.04)}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+label{display:block;font-weight:700;color:var(--muted);margin-bottom:6px}
+input[type="number"], input[type="text"], select, textarea{padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:#fff;font-size:14px;color:var(--text);width:100%}
+.row{display:flex;gap:8px;align-items:center}
+.muted{color:var(--muted);font-size:13px}
+
+/* Buttons */
+.btn{background:var(--accent);color:#111827;padding:10px 12px;border-radius:10px;border:none;font-weight:800;cursor:pointer}
+.btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--text)}
+.small-ghost{background:transparent;border:1px dashed rgba(0,0,0,0.06);padding:8px;border-radius:8px;cursor:pointer}
+
+/* Products list */
+.products-list{display:flex;flex-direction:column;gap:10px}
+.product-item{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:10px;border:1px solid rgba(220,210,190,0.5);background:linear-gradient(180deg,#fff,#fbf9f2)}
+.product-item .meta{color:var(--muted);font-size:13px}
+.product-controls button{margin-left:8px}
+
+/* Summary */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:8px}
+.summary-box{padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#fff);border:1px solid var(--card-border)}
+.v{font-weight:800;color:var(--text)}
+
+/* Footer tabs */
+.footer-tabs{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;width:92%;max-width:920px;padding:8px;background:linear-gradient(180deg,#fff,var(--surface));border-radius:999px;border:1px solid rgba(0,0,0,0.04);display:flex;gap:8px;justify-content:center;box-shadow:0 -10px 30px rgba(17,24,39,0.05)}
+.tab-btn{flex:1;padding:10px;border-radius:10px;text-align:center;cursor:pointer;color:var(--muted);font-weight:700}
+.tab-btn.active{background:linear-gradient(180deg,var(--accent),#e7cc87);color:var(--text);transform:translateY(-6px);box-shadow:0 8px 18px rgba(0,0,0,0.08)}
+
+/* Modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:10000}
+.modal{background:#fff;border-radius:12px;padding:18px;width:720px;max-width:94%;box-shadow:0 14px 40px rgba(0,0,0,0.3)}
+.modal h3{margin:0 0 10px 0;color:var(--text)}
+.modal .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+
+/* Small responsive tweaks */
+@media(max-width:880px){
+  .grid-3{grid-template-columns:1fr}
+  .modal{width:92%}
+}
+@media(max-width:520px){
+  .header{padding:10px}
+  .logo-wrap{display:none}
+  .footer-tabs{padding:6px}
+  .modal .form-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="header">
+      <div class="logo-wrap"><img src="assets/banana-canela-logo.png" alt="Logo" /></div>
+      <div class="title-block">
+        <h1>Precificação • Doceria</h1>
+        <div class="subtitle">Calc. CMV · Markup 3× · iFood · Offline</div>
+      </div>
+    </header>
+
+    <div class="container">
+      <!-- ===== Custos Fixos (inclui Mão de Obra) ===== -->
+      <section id="panel-costs" class="card">
+        <h2 style="margin:0 0 6px 0">Custos Fixos</h2>
+        <div class="muted">Defina custos fixos e mão de obra</div>
+
+        <div style="margin-top:12px" class="grid-3">
+          <div><label>Aluguel (R$)</label><input id="aluguel" type="number" value="0" /></div>
+          <div><label>Energia (R$)</label><input id="energia" type="number" value="0" /></div>
+          <div><label>Água (R$)</label><input id="agua" type="number" value="0" /></div>
+        </div>
+
+        <div style="margin-top:10px" class="grid-3">
+          <div><label>Internet (R$)</label><input id="internet" type="number" value="0" /></div>
+          <div><label>Telefone (R$)</label><input id="telefone" type="number" value="0" /></div>
+          <div><label>Gás (R$)</label><input id="gas" type="number" value="0" /></div>
+        </div>
+
+        <div style="margin-top:10px" class="grid-3">
+          <div><label>Marketing (R$)</label><input id="marketing" type="number" value="0" /></div>
+          <div><label>Taxas fixas apps (R$)</label><input id="taxasApps" type="number" value="0" /></div>
+          <div><label>Taxa iFood (%)</label><input id="taxaIfood" type="number" value="0" /></div>
+        </div>
+
+        <div style="margin-top:12px" class="grid-2">
+          <div><label>Meta de lucro mensal (R$)</label><input id="metaLucroMensal" type="number" value="0" /></div>
+          <div><label>% Absorção progressiva</label><input id="absorcaoProgressiva" type="number" value="0" /></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <label>Distribuição de canais (modifique para simular)</label>
+          <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
+            <div style="flex:1;min-width:140px">
+              <label style="font-size:13px;margin-bottom:4px">Venda direta</label>
+              <input id="percVendasDiretas" type="number" value="0" />
+            </div>
+            <div style="flex:1;min-width:140px">
+              <label style="font-size:13px;margin-bottom:4px">iFood</label>
+              <input id="percVendasIfood" type="number" value="0" />
+            </div>
+            <div style="white-space:nowrap;margin-left:auto;color:var(--muted)">Total: <span id="distTotal">0%</span></div>
+          </div>
+        </div>
+
+        <!-- Mão de obra -->
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--card-border)">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <h3 style="margin:0">Mão de Obra</h3>
+              <div class="muted">Insira funcionários / colaboradores</div>
+            </div>
+            <div><button class="btn" id="btnAddLabor">+ Pessoa</button></div>
+          </div>
+
+          <div id="laborList" style="margin-top:12px"></div>
+
+          <div class="summary-grid" style="margin-top:12px">
+            <div class="summary-box"><div class="muted">Total Horas/Mês</div><div id="totalHoras" class="v">0h</div></div>
+            <div class="summary-box"><div class="muted">Custo Hora Médio</div><div id="custoHoraMedio" class="v">R$ 0,00</div></div>
+            <div class="summary-box"><div class="muted">Custo Fixo (operacional)</div><div id="fixedOperational" class="v">R$ 0,00</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Produtos ===== -->
+      <section id="panel-products" class="card" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <h2 style="margin:0">Produtos</h2>
+            <div class="muted">Cadastre seus produtos (edite valores)</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn" id="btnAddProduct">+ Produto</button>
+            <button class="small-ghost" id="btnNormalize">Normalizar %</button>
+          </div>
+        </div>
+
+        <div id="productsContainer" class="products-list" style="margin-top:12px"></div>
+      </section>
+
+      <!-- ===== Resultados ===== -->
+      <section id="panel-results" class="card" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <h2 style="margin:0">Resultados</h2>
+            <div class="muted">Faturamento mínimo e vendas necessárias por produto</div>
+          </div>
+        </div>
+
+        <div class="summary-grid">
+          <div class="summary-box"><div class="muted">Custos Fixos Totais</div><div id="fixedTotal" class="v">R$ 0,00</div></div>
+          <div class="summary-box"><div class="muted">Meta Lucro</div><div id="metaVal" class="v">R$ 0,00</div></div>
+          <div class="summary-box"><div class="muted">Faturamento Mínimo</div><div id="faturamentoMin" class="v">R$ 0,00</div></div>
+          <div class="summary-box"><div class="muted">Custo Hora Médio</div><div id="custoHoraMedioResult" class="v">R$ 0,00</div></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <strong>Quantidade mínima necessária por produto</strong>
+          <div id="qtdResult" style="margin-top:8px"></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="card">
+              <div class="muted">Distribuição de participação</div>
+              <div style="height:160px"><canvas id="participChart"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="muted">CMV médio ponderado</div>
+              <div style="height:160px"><canvas id="cmvChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <nav class="footer-tabs" role="navigation">
+      <div class="tab-btn active" data-tab="costs">⚙️ Custos Fixos</div>
+      <div class="tab-btn" data-tab="products">🍰 Produtos</div>
+      <div class="tab-btn" data-tab="results">📊 Resultados</div>
+    </nav>
+  </div>
+
+  <!-- Modal root -->
+  <div id="modalRoot" style="display:none"></div>
+
+<script>
+/* =========================
+   STATE
+   ========================= */
+const STORAGE_KEY = 'doceria_precificacao_v4';
+let state = {
+  config:{
+    aluguel:0,energia:0,agua:0,internet:0,telefone:0,gas:0,marketing:0,taxasApps:0,
+    taxaIfood:0,percVendasDiretas:0,percVendasIfood:0,absorcaoProgressiva:0,metaLucroMensal:0
+  },
+  labor:[], // start empty
+  products:[
+    { id: genId(), name:'Produto', unitsPerRecipe:1, unitsPerPackage:1, ingredientCost:0, packagingCost:0, productionTimeHours:0, participationPercent:0, marginPercent:0 }
+  ]
+};
+
+function loadState(){ try{ const raw = localStorage.getItem(STORAGE_KEY); if(raw) state = JSON.parse(raw); }catch(e){ console.warn(e) } }
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){ console.warn(e) } }
+loadState();
+
+/* helpers */
+function $(id){ return document.getElementById(id); }
+function money(v){ return 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function genId(){ return 'id'+Math.random().toString(36).slice(2,9); }
+
+/* ===== RENDER CONFIG & LABOR ===== */
+function renderConfig(){
+  const c = state.config;
+  $('aluguel').value = c.aluguel||0;
+  $('energia').value = c.energia||0;
+  $('agua').value = c.agua||0;
+  $('internet').value = c.internet||0;
+  $('telefone').value = c.telefone||0;
+  $('gas').value = c.gas||0;
+  $('marketing').value = c.marketing||0;
+  $('taxasApps').value = c.taxasApps||0;
+  $('taxaIfood').value = c.taxaIfood||0;
+  $('percVendasDiretas').value = c.percVendasDiretas||0;
+  $('percVendasIfood').value = c.percVendasIfood||0;
+  $('absorcaoProgressiva').value = c.absorcaoProgressiva||0;
+  $('metaLucroMensal').value = c.metaLucroMensal||0;
+  updateDistributionTotal();
+}
+
+function renderLabor(){
+  const list = $('laborList'); list.innerHTML = '';
+  state.labor.forEach((l,i)=>{
+    const row = document.createElement('div');
+    row.style.display='flex'; row.style.gap='8px'; row.style.alignItems='center'; row.style.marginBottom='8px';
+    row.innerHTML = `
+      <input data-i="${i}" class="lab-name" placeholder="Nome" value="${l.name||''}" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eee" />
+      <input data-i="${i}" class="lab-role" placeholder="Função" value="${l.role||''}" style="width:120px;padding:8px;border-radius:8px;border:1px solid #eee" />
+      <input data-i="${i}" class="lab-rate" type="number" placeholder="R$/h" value="${l.hourlyRate||0}" style="width:110px;padding:8px;border-radius:8px;border:1px solid #eee" />
+      <input data-i="${i}" class="lab-hours" type="number" placeholder="Horas/mês" value="${l.hoursMonth||0}" style="width:110px;padding:8px;border-radius:8px;border:1px solid #eee" />
+      <button class="small-ghost" data-i="${i}" title="Remover">Remover</button>
+    `;
+    list.appendChild(row);
+  });
+
+  // attach events
+  list.querySelectorAll('.lab-name').forEach(el=>el.addEventListener('input', e=>{ const i=e.target.dataset.i; state.labor[i].name = e.target.value; saveState(); calculateLabor(); }));
+  list.querySelectorAll('.lab-role').forEach(el=>el.addEventListener('input', e=>{ const i=e.target.dataset.i; state.labor[i].role = e.target.value; saveState(); calculateLabor(); }));
+  list.querySelectorAll('.lab-rate').forEach(el=>el.addEventListener('input', e=>{ const i=e.target.dataset.i; state.labor[i].hourlyRate = Number(e.target.value||0); saveState(); calculateLabor(); }));
+  list.querySelectorAll('.lab-hours').forEach(el=>el.addEventListener('input', e=>{ const i=e.target.dataset.i; state.labor[i].hoursMonth = Number(e.target.value||0); saveState(); calculateLabor(); }));
+  list.querySelectorAll('button').forEach(btn=>btn.addEventListener('click', e=>{
+    const i = Number(btn.dataset.i);
+    if(confirm('Tem certeza que quer remover essa pessoa?')){ state.labor.splice(i,1); saveState(); renderLabor(); calculateLabor(); }
+  }));
+
+  calculateLabor();
+}
+
+function addLaborPerson(){ state.labor.push({ name:'', role:'', hourlyRate:0, hoursMonth:0 }); saveState(); renderLabor(); }
+
+/* labor calculations */
+function getLaborTotals(){
+  let totalHours=0, totalCost=0;
+  state.labor.forEach(l=>{ const h=Number(l.hoursMonth||0), r=Number(l.hourlyRate||0); totalHours+=h; totalCost+=h*r; });
+  const avgHourly = totalHours>0 ? totalCost/totalHours : 0;
+  return { totalHours, totalCost, avgHourly };
+}
+
+function calculateLabor(){
+  const totals = getLaborTotals();
+  $('totalHoras').textContent = totals.totalHours + 'h';
+  $('custoHoraMedio').textContent = money(totals.avgHourly);
+  $('fixedOperational').textContent = money(getFixedCostsOperational());
+}
+
+/* fixed costs helpers */
+function getFixedCostsOperational(){ const c=state.config; const keys=['aluguel','energia','agua','internet','telefone','gas','marketing','taxasApps']; let sum=0; keys.forEach(k=> sum+=Number(c[k]||0)); return sum; }
+function getFixedCostsTotal(){ return getFixedCostsOperational() + getLaborTotals().totalCost; }
+
+/* =========================
+   PRODUCTS (list + modal + actions)
+   ========================= */
+function renderProductsList_inner(){
+  const cont = $('productsContainer'); cont.innerHTML='';
+  state.products.forEach((p, idx)=>{
+    const item = document.createElement('div'); item.className='product-item';
+    const left = document.createElement('div');
+    left.innerHTML = `<div style="font-weight:800;color:var(--text)">${p.name || 'Produto'}</div>
+                      <div class="meta">Rend.: ${p.unitsPerRecipe || 0} un • Embalagem: ${p.unitsPerPackage || 0} • Tempo: ${p.productionTimeHours || 0}h</div>`;
+    const right = document.createElement('div'); right.className='product-controls';
+    right.innerHTML = `
+      <button class="small-ghost" data-idx="${idx}" data-action="edit">Editar</button>
+      <button class="small-ghost" data-idx="${idx}" data-action="dup">Duplicar</button>
+      <button class="small-ghost" data-idx="${idx}" data-action="remove" title="Remover">✕</button>
+    `;
+    item.appendChild(left); item.appendChild(right);
+    cont.appendChild(item);
+  });
+
+  cont.querySelectorAll('button').forEach(btn=>{
+    const idx = Number(btn.dataset.idx);
+    const act = btn.dataset.action;
+    btn.addEventListener('click', ()=> {
+      if(act==='edit') openProductModal(idx);
+      if(act==='dup'){ duplicateProduct(idx); }
+      if(act==='remove'){
+        if(confirm('Tem certeza que quer remover esse produto?')){
+          state.products.splice(idx,1); saveState(); renderProductsList_inner(); calculateResults();
+        }
+      }
+    });
+  });
+}
+let renderProductsList = renderProductsList_inner; // alias
+
+function addEmptyProduct(){ openProductModal(); }
+
+function duplicateProduct(i){
+  const src = state.products[i];
+  const copy = JSON.parse(JSON.stringify(src));
+  copy.id = genId();
+  state.products.push(copy);
+  saveState(); renderProductsList(); calculateResults();
+}
+
+/* Product modal: open (index optional) */
+function openProductModal(index){
+  const isNew = (index === undefined || index === null);
+  const product = isNew ? { id: genId(), name:'Produto', unitsPerRecipe:1, unitsPerPackage:1, ingredientCost:0, packagingCost:0, productionTimeHours:0, participationPercent:0, marginPercent:0 } : JSON.parse(JSON.stringify(state.products[index]));
+  const root = $('modalRoot');
+  root.innerHTML = `
+    <div class="modal-backdrop" id="modalBackdrop">
+      <div class="modal" role="dialog" aria-modal="true">
+        <h3>${isNew? 'Novo Produto' : 'Editar Produto'}</h3>
+        <div class="form-grid">
+          <div><label>Nome</label><input id="m_name" type="text" value="${escapeHtml(product.name)}" /></div>
+          <div><label>Participação %</label><input id="m_part" type="number" value="${Number(product.participationPercent||0)}" /></div>
+          <div><label>Un/receita</label><input id="m_units" type="number" value="${Number(product.unitsPerRecipe||1)}" /></div>
+          <div><label>Un/embalagem</label><input id="m_unitsPack" type="number" value="${Number(product.unitsPerPackage||1)}" /></div>
+          <div><label>Custo ingredientes (R$) — total receita</label><input id="m_ing" type="number" step="0.01" value="${Number(product.ingredientCost||0)}" /></div>
+          <div><label>Custo embalagem (R$)</label><input id="m_pack" type="number" step="0.01" value="${Number(product.packagingCost||0)}" /></div>
+          <div><label>Tempo produção (h)</label><input id="m_time" type="number" step="0.1" value="${Number(product.productionTimeHours||0)}" /></div>
+          <div><label>Margem %</label><input id="m_margin" type="number" value="${Number(product.marginPercent||0)}" /></div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="m_save">Salvar</button>
+          <button class="small-ghost" id="m_close">Fechar</button>
+        </div>
+      </div>
+    </div>
+  `;
+  root.style.display='block';
+
+  $('m_close').addEventListener('click', ()=> { root.style.display='none'; root.innerHTML=''; });
+  $('m_save').addEventListener('click', ()=>{
+    const newP = {
+      id: product.id,
+      name: $('m_name').value || 'Produto',
+      unitsPerRecipe: Number($('m_units').value||0),
+      unitsPerPackage: Number($('m_unitsPack').value||0),
+      ingredientCost: Number($('m_ing').value||0),
+      packagingCost: Number($('m_pack').value||0),
+      productionTimeHours: Number($('m_time').value||0),
+      participationPercent: Number($('m_part').value||0),
+      marginPercent: Number($('m_margin').value||0)
+    };
+    if(isNew){
+      state.products.push(newP);
+    } else {
+      state.products[index] = newP;
+    }
+    saveState(); renderProductsList(); calculateResults();
+    root.style.display='none'; root.innerHTML='';
+  });
+}
+
+/* escape helper */
+function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* =========================
+   CALCULOS POR PRODUTO (mantive a lógica combinada)
+   ========================= */
+function calculatePerProduct(product){
+  const labor = getLaborTotals();
+  const avgHourly = labor.avgHourly || 0;
+
+  const productionTime = Number(product.productionTimeHours||0);
+  const laborCostRecipe = productionTime * avgHourly;
+  const units = Number(product.unitsPerRecipe) || 1;
+  const laborCostPerUnit = units>0 ? (laborCostRecipe / units) : 0;
+
+  const ingredientTotal = Number(product.ingredientCost||0);
+  const ingredientPerUnit = units>0 ? (ingredientTotal / units) : 0;
+
+  const costPerUnit = ingredientPerUnit + laborCostPerUnit;
+  const costPerPackage = (costPerUnit * (Number(product.unitsPerPackage)||1)) + Number(product.packagingCost||0);
+
+  const absorcaoPct = Number(state.config.absorcaoProgressiva||0) / 100;
+  const fixedCostAbsorption = costPerPackage * absorcaoPct;
+  const totalCostWithFixed = costPerPackage + fixedCostAbsorption;
+
+  const marginPct = Number(product.marginPercent||0) / 100;
   const precoDireto = marginPct < 0.999 ? ( totalCostWithFixed / (1 - marginPct) ) : totalCostWithFixed;
   const taxaIfood = Number(state.config.taxaIfood||0) / 100;
   const precoIfood = taxaIfood < 0.999 ? ( precoDireto / (1 - taxaIfood) ) : precoDireto;
@@ -533,13 +975,11 @@ function calculatePerProduct(product){
 }
 
 /* =========================
-   Results + charts
+   RESULTADOS E GRÁFICOS
    ========================= */
 let participationChart = null, cmvChart = null;
 function calculateResults(){
-  // config values from DOM -> sync state.config first
   syncConfigFromDOM();
-
   const fixedTotal = getFixedCostsTotal();
   const metaLucro = Number(state.config.metaLucroMensal||0);
   const faturamentoMin = fixedTotal + metaLucro;
@@ -551,7 +991,6 @@ function calculateResults(){
   const labor = getLaborTotals();
   $('custoHoraMedioResult').textContent = money(labor.avgHourly);
 
-  // distribution and product required quantities
   const qdiv = $('qtdResult'); qdiv.innerHTML = '';
   let totalParticipation = 0; state.products.forEach(p=> totalParticipation += Number(p.participationPercent||0));
   if(totalParticipation <= 0){
@@ -559,10 +998,9 @@ function calculateResults(){
   } else {
     if(Math.abs(totalParticipation - 100) > 0.1){
       const warn = document.createElement('div'); warn.className='muted'; warn.style.marginBottom='8px';
-      warn.innerHTML = `⚠️ A soma das participações = ${totalParticipation.toFixed(1)}%. (use "Normalizar %" se desejar ajustar)`;
+      warn.innerHTML = `⚠️ A soma das participações = ${totalParticipation.toFixed(1)}%. (use "Normalizar %")`;
       qdiv.appendChild(warn);
     }
-
     const labels = [], dataPct = [], dataCMV = [];
     state.products.forEach(p=>{
       const calc = calculatePerProduct(p);
@@ -570,9 +1008,8 @@ function calculateResults(){
       const faturProduto = faturamentoMin * (particip/100);
       const qtdNecessaria = calc.margemUnitaria > 0 ? Math.ceil(faturProduto / calc.margemUnitaria) : 0;
 
-      // render small row
       const box = document.createElement('div'); box.className='product-item';
-      box.innerHTML = `<div><div style="font-weight:800;color:var(--brown)">${p.name}</div>
+      box.innerHTML = `<div><div style="font-weight:800;color:var(--text)">${p.name}</div>
                        <div class="meta">Preço Direto: <strong>${money(calc.precoDireto)}</strong> • iFood: <strong>${money(calc.precoIfood)}</strong></div>
                       </div>
                       <div style="text-align:right"><div class="muted">CMV ${calc.cmv.toFixed(1)}%</div><div style="font-weight:800">${qtdNecessaria} un/mês</div></div>`;
@@ -582,12 +1019,10 @@ function calculateResults(){
       dataPct.push(particip);
       dataCMV.push(calc.cmv);
     });
-
     updateCharts(labels, dataPct, dataCMV);
   }
 }
 
-/* Charts */
 function updateCharts(labels, dataPct, dataCMV){
   const ctx = $('participChart').getContext('2d');
   const ctx2 = $('cmvChart').getContext('2d');
@@ -607,12 +1042,12 @@ function updateCharts(labels, dataPct, dataCMV){
   });
 }
 function generateColors(n){
-  const palette=['#C8AD57','#9C7050','#F2D9A7','#E3C89A','#D8B77C','#EEDFC8','#B78A60'];
+  const palette=['#C9A86A','#9C7050','#E5D5B5','#D8B77C','#EEDFC8','#B78A60'];
   const out=[]; for(let i=0;i<n;i++) out.push(palette[i%palette.length]); return out;
 }
 
 /* =========================
-   UI sync / events
+   UI SYNC / EVENTS
    ========================= */
 function syncConfigFromDOM(){
   const c = state.config;
@@ -629,21 +1064,20 @@ function syncConfigFromDOM(){
   c.percVendasIfood = Number($('percVendasIfood').value||0);
   c.absorcaoProgressiva = Number($('absorcaoProgressiva').value||0);
   c.metaLucroMensal = Number($('metaLucroMensal').value||0);
-  saveState();
-  updateDistributionTotal();
+  saveState(); updateDistributionTotal();
 }
+
 function updateDistributionTotal(){ const a=Number($('percVendasDiretas').value||0), b=Number($('percVendasIfood').value||0); $('distTotal').textContent = (a+b).toFixed(1) + '%'; }
 
-/* attach inputs to sync */
+/* attach inputs */
 ['aluguel','energia','agua','internet','telefone','gas','marketing','taxasApps','taxaIfood','percVendasDiretas','percVendasIfood','absorcaoProgressiva','metaLucroMensal'].forEach(id=>{
-  const el = $(id);
-  if(!el) return;
+  const el = $(id); if(!el) return;
   el.addEventListener('input', ()=>{ syncConfigFromDOM(); calculateResults(); });
 });
 
-/* product add/normalize */
-$('btnAddProduct').addEventListener('click', ()=> openProductModal()); // open empty modal
-$('btnNormalize').addEventListener('click', ()=>{
+/* products: add / normalize / buttons */
+$('btnAddProduct').addEventListener('click', ()=> openProductModal());
+$('btnNormalize').addEventListener('click', ()=> {
   let sum=0; state.products.forEach(p=> sum += Number(p.participationPercent||0));
   if(sum === 0){ alert('Soma zero — atribua % antes de normalizar'); return; }
   state.products.forEach(p=> p.participationPercent = (Number(p.participationPercent||0) / sum) * 100);
@@ -651,7 +1085,7 @@ $('btnNormalize').addEventListener('click', ()=>{
 });
 
 /* labor add */
-$('btnAddLabor').addEventListener('click', ()=> { addLaborPerson(); });
+$('btnAddLabor').addEventListener('click', ()=> addLaborPerson());
 
 /* footer tabs */
 const tabButtons = document.querySelectorAll('.tab-btn');
@@ -671,50 +1105,11 @@ renderProductsList();
 calculateResults();
 saveState();
 
-/* helper: render products list function defined earlier but not as const (make sure available) */
-function renderProductsList(){ renderProductsList_inner(); } // placeholder to avoid double declaration - replaced below
-
-/* Because renderProductsList used above, implement it now (keeps scoping neat) */
-function renderProductsList_inner(){
-  const cont = $('productsContainer'); cont.innerHTML='';
-  state.products.forEach((p, idx)=>{
-    const item = document.createElement('div'); item.className='product-item';
-    const left = document.createElement('div');
-    left.innerHTML = `<div style="font-weight:800;color:var(--brown)">${p.name || 'Produto'}</div>
-                      <div class="meta">Rend.: ${p.unitsPerRecipe || 0} un • Embalagem: ${p.unitsPerPackage || 0} • Tempo: ${p.productionTimeHours || p.productionTime || 0}h</div>`;
-    const right = document.createElement('div'); right.className='product-controls';
-    right.innerHTML = `
-      <button class="small-ghost" data-idx="${idx}" data-action="edit">Editar</button>
-      <button class="small-ghost" data-idx="${idx}" data-action="dup">Duplicar</button>
-      <button class="small-ghost" data-idx="${idx}" data-action="remove" title="Remover">✕</button>
-    `;
-    item.appendChild(left); item.appendChild(right);
-    cont.appendChild(item);
-  });
-
-  // attach control events
-  cont.querySelectorAll('button').forEach(btn=>{
-    const idx = Number(btn.dataset.idx);
-    const act = btn.dataset.action;
-    btn.addEventListener('click', ()=> {
-      if(act==='edit') openProductModal(idx);
-      if(act==='dup'){ duplicateProduct(idx); }
-      if(act==='remove'){
-        if(confirm('Tem certeza que quer remover esse produto?')){
-          state.products.splice(idx,1); saveState(); renderProductsList_inner(); calculateResults();
-        }
-      }
-    });
-  });
-}
-
-/* update alias used earlier */
-renderProductsList = renderProductsList_inner;
-
-/* expose some functions to console for quick debug */
+/* Expose for debug */
 window._state = state;
 window._save = saveState;
 window._calc = calculateResults;
 </script>
 </body>
 </html>
+
