@@ -54,6 +54,39 @@ input[type="number"], input[type="text"], select, textarea{
 .modal .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
 @media(max-width:760px){ .grid-3{grid-template-columns:1fr} .modal{width:92%} .logo-wrap{display:none} }
+
+/* ===== CSS da Distribuição de Canais ===== */
+
+.dist-wrapper {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  width: 100%;
+}
+
+.dist-col {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+}
+
+.dist-total {
+  align-self: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .dist-wrapper {
+    flex-direction: column;
+  }
+  .dist-col {
+    width: 100%;
+  }
+  .dist-total {
+    align-self: flex-start;
+    margin-top: -4px;
+  }
+}
 </style>
 </head>
 <body>
@@ -97,8 +130,27 @@ input[type="number"], input[type="text"], select, textarea{
         </div>
 
         <div style="margin-top:12px">
-          <label>Distribuição de canais (modifique para simular)</label>
-           <div class="dist-wrapper">
+  <label>Distribuição de canais (modifique para simular)</label>
+
+  <div class="dist-wrapper">
+    
+    <div class="dist-col">
+      <label style="margin-bottom:4px">Venda direta</label>
+      <input id="percVendasDiretas" type="number" value="0" />
+    </div>
+
+    <div class="dist-col">
+      <label style="margin-bottom:4px">iFood</label>
+      <input id="percVendasIfood" type="number" value="0" />
+    </div>
+
+    <div class="dist-total">
+      Total: <span id="distTotal">0%</span>
+    </div>
+
+  </div>
+</div>
+
     
     <!-- Coluna Venda Direta -->
     <div class="dist-col">
@@ -200,45 +252,6 @@ input[type="number"], input[type="text"], select, textarea{
 
   <!-- Product Modal (hidden until used) -->
   <div id="modalRoot" style="display:none"></div>
-  
-/* Desktop */
-.dist-wrapper {
-  display: flex;
-  gap: 8px;
-  margin-top: 6px;
-  width: 100%;
-}
-
-.dist-col {
-  display: flex;
-  flex-direction: column;
-  width: 40%;
-}
-
-.dist-col label {
-  margin-bottom: 4px;
-}
-
-.dist-total {
-  align-self: center;
-  white-space: nowrap;
-}
-
-/* Mobile */
-@media (max-width: 600px) {
-  .dist-wrapper {
-    flex-direction: column;
-  }
-
-  .dist-col {
-    width: 100%;
-  }
-
-  .dist-total {
-    align-self: flex-start;
-    margin-top: -4px;
-  }
-}
 
 <script>
 /* =========================
