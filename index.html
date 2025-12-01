@@ -133,7 +133,6 @@ input[type="number"], input[type="text"], select, textarea{
   <label>Distribuição de canais (modifique para simular)</label>
 
   <div class="dist-wrapper">
-    
     <div class="dist-col">
       <label style="margin-bottom:4px">Venda direta</label>
       <input id="percVendasDiretas" type="number" value="0" />
@@ -147,7 +146,36 @@ input[type="number"], input[type="text"], select, textarea{
     <div class="dist-total">
       Total: <span id="distTotal">0%</span>
     </div>
+  </div>
+</div>
 
+<!-- Mão de obra -->
+<div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--card-border)">
+  <div style="display:flex; justify-content:space-between; align-items:center">
+    <div>
+      <h3 style="margin:0">Mão de Obra</h3>
+      <div class="muted">Insira funcionários / colaboradores</div>
+    </div>
+    <div><button class="btn" id="btnAddLabor">+ Pessoa</button></div>
+  </div>
+
+  <div id="laborList" style="margin-top:12px"></div>
+
+  <div class="summary-grid" style="margin-top:12px">
+    <div class="summary-box">
+      <div class="muted">Total Horas/Mês</div>
+      <div id="totalHoras" style="font-weight:800">0h</div>
+    </div>
+
+    <div class="summary-box">
+      <div class="muted">Custo Hora Médio</div>
+      <div id="custoHoraMedio" style="font-weight:800">R$ 0,00</div>
+    </div>
+
+    <div class="summary-box">
+      <div class="muted">Custo Fixo (mensal)</div>
+      <div id="fixedOperational" style="font-weight:800">R$ 0,00</div>
+    </div>
   </div>
 </div>
 
