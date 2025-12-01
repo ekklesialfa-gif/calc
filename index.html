@@ -65,16 +65,30 @@
     .dist-col{display:flex;flex-direction:column;width:40%}
     .dist-total{align-self:center;white-space:nowrap}
 
+    /* --------------------------------------------- */
+    /* ⭐ FIX DA ABA RESULTADOS (responsividade) ⭐ */
+    /* --------------------------------------------- */
+    .results-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:12px;
+    }
+
+    /* Garantia extra para telas muito pequenas */
+    @media(max-width:420px){
+      .results-grid{
+        grid-template-columns:1fr !important;
+      }
+      .footer-tabs{padding:6px; bottom:8px}
+    }
+
     @media(max-width:920px){
       .grid-3{grid-template-columns:1fr}
       .grid-2{grid-template-columns:1fr}
       .modal{width:92%}
       .logo-wrap{display:none}
     }
-    @media(max-width:420px){
-      .footer-tabs{padding:6px; bottom:8px}
-    }
-  </style>
+</style>
 </head>
 <body>
   <div class="app" id="app">
@@ -191,7 +205,7 @@
         </div>
 
         <div style="margin-top:12px">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="results-grid">
             <div class="card"><div class="muted-small">Distribuição de participação</div><div style="height:160px"><canvas id="participChart"></canvas></div></div>
             <div class="card"><div class="muted-small">CMV médio ponderado</div><div style="height:160px"><canvas id="cmvChart"></canvas></div></div>
           </div>
