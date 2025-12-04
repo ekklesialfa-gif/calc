@@ -87,35 +87,36 @@
 
     /* Tabs Navigation */
     .tabs-nav {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--bg-card);
-  border-radius: 50px;
-  padding: 8px;
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  box-shadow: 0 10px 40px var(--shadow-lg);
-  z-index: 1000;
-  max-width: calc(100% - 40px);
-  width: 90%;
-}
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-card);
+      border-radius: 50px;
+      padding: 8px;
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+      box-shadow: 0 10px 40px var(--shadow-lg);
+      z-index: 1000;
+      max-width: calc(100% - 40px);
+      width: 95%;
+    }
 
-@media (min-width: 769px) {
-  .tabs-nav {
-    width: fit-content;
-    justify-content: center;
-  }
+    @media (min-width: 769px) {
+      .tabs-nav {
+        width: fit-content;
+        justify-content: center;
+        gap: 8px;
+      }
     }
 
     .tab-btn {
-      padding: 12px 24px;
+      padding: 12px 20px;
       border: none;
       background: transparent;
       color: var(--gray);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       border-radius: 50px;
       cursor: pointer;
@@ -123,10 +124,9 @@
       white-space: nowrap;
       display: flex;
       align-items: center;
-      gap: 8px;
-      flex: 1;
-      padding: 10px 8px;
       justify-content: center;
+      gap: 6px;
+      flex: 1;
     }
 
     .tab-btn:hover {
@@ -139,7 +139,6 @@
       color: white;
       box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
     }
-    
 
     /* Panels */
     .panel {
@@ -227,6 +226,12 @@
       background: white;
     }
 
+    input:disabled {
+      background: #f1f5f9;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
     /* Buttons */
     .btn {
       padding: 12px 24px;
@@ -299,8 +304,8 @@
       font-weight: 700;
     }
 
-    /* Labor List */
-    .labor-item {
+    /* Labor/Ingredient/Recipe Items */
+    .labor-item, .ingredient-item, .recipe-ingredient-item {
       display: grid;
       grid-template-columns: 1fr 1fr 100px 100px auto;
       gap: 12px;
@@ -311,8 +316,16 @@
       margin-bottom: 12px;
     }
 
-    /* Products List */
-    .product-item {
+    .ingredient-item {
+      grid-template-columns: 1fr 120px 120px 140px auto;
+    }
+
+    .recipe-ingredient-item {
+      grid-template-columns: 2fr 150px auto;
+    }
+
+    /* Product/Recipe List */
+    .product-item, .recipe-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -323,22 +336,22 @@
       gap: 12px;
     }
 
-    .product-info {
+    .product-info, .recipe-info {
       flex: 1;
     }
 
-    .product-name {
+    .product-name, .recipe-name {
       font-weight: 600;
       color: var(--dark);
       margin-bottom: 4px;
     }
 
-    .product-meta {
+    .product-meta, .recipe-meta {
       font-size: 13px;
       color: var(--gray);
     }
 
-    .product-actions {
+    .product-actions, .recipe-actions {
       display: flex;
       gap: 8px;
     }
@@ -360,7 +373,7 @@
       background: var(--bg-card);
       border-radius: var(--radius-lg);
       padding: 32px;
-      max-width: 600px;
+      max-width: 700px;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
@@ -411,6 +424,20 @@
       white-space: nowrap;
     }
 
+    /* Recipe Ingredients Section */
+    .recipe-ingredients-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px dashed var(--border);
+    }
+
+    .add-ingredient-row {
+      display: grid;
+      grid-template-columns: 2fr 150px auto;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .app-container {
@@ -440,17 +467,21 @@
         grid-template-columns: 1fr;
       }
 
-      .labor-item {
+      .labor-item, .ingredient-item, .recipe-ingredient-item {
         grid-template-columns: 1fr;
         gap: 8px;
       }
 
-      .product-item {
+      .add-ingredient-row {
+        grid-template-columns: 1fr;
+      }
+
+      .product-item, .recipe-item {
         flex-direction: column;
         align-items: flex-start;
       }
 
-      .product-actions {
+      .product-actions, .recipe-actions {
         width: 100%;
         justify-content: flex-start;
       }
@@ -461,8 +492,9 @@
       }
 
       .tab-btn {
-        padding: 10px 16px;
-        font-size: 13px;
+        padding: 10px 8px;
+        font-size: 11px;
+        gap: 4px;
       }
 
       .tab-btn span {
@@ -505,6 +537,17 @@
       margin-bottom: 16px;
       opacity: 0.5;
     }
+
+    /* Badge */
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--success);
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -531,35 +574,35 @@
         <div class="form-grid">
           <div class="form-group">
             <label>Aluguel (R$)</label>
-            <input type="number" id="aluguel" value="0" step="0.01">
+            <input type="number" id="aluguel" placeholder="0,00" step="0.01">
           </div>
           <div class="form-group">
             <label>Energia (R$)</label>
-            <input type="number" id="energia" value="0" step="0.01">
+            <input type="number" id="energia" placeholder="0,00" step="0.01">
           </div>
           <div class="form-group">
             <label>Água (R$)</label>
-            <input type="number" id="agua" value="0" step="0.01">
+            <input type="number" id="agua" placeholder="0,00" step="0.01">
           </div>
           <div class="form-group">
             <label>Internet (R$)</label>
-            <input type="number" id="internet" value="0" step="0.01">
+            <input type="number" id="internet" placeholder="0,00" step="0.01">
           </div>
           <div class="form-group">
             <label>Telefone (R$)</label>
-            <input type="number" id="telefone" value="0" step="0.01">
+            <input type="number" id="telefone" placeholder="0,00" step="0.01">
           </div>
           <div class="form-group">
             <label>Gás (R$)</label>
-            <input type="number" id="gas" value="0" step="0.01">
+            <input type="number" id="gas" placeholder="0,00" step="0.01">
           </div>
           <div class="form-group">
             <label>Marketing (R$)</label>
-            <input type="number" id="marketing" value="0" step="0.01">
+            <input type="number" id="marketing" placeholder="0,00" step="0.01">
           </div>
           <div class="form-group">
             <label>Taxas Apps (R$)</label>
-            <input type="number" id="taxasApps" value="0" step="0.01">
+            <input type="number" id="taxasApps" placeholder="0,00" step="0.01">
           </div>
         </div>
 
@@ -568,15 +611,15 @@
         <div class="form-grid">
           <div class="form-group">
             <label>Taxa iFood (%)</label>
-            <input type="number" id="taxaIfood" value="0" step="0.1">
+            <input type="number" id="taxaIfood" placeholder="0" step="0.1">
           </div>
           <div class="form-group">
             <label>Meta de Lucro Mensal (R$)</label>
-            <input type="number" id="metaLucroMensal" value="0" step="0.01">
+            <input type="number" id="metaLucroMensal" placeholder="0,00" step="0.01">
           </div>
           <div class="form-group">
             <label>% Absorção Progressiva</label>
-            <input type="number" id="absorcaoProgressiva" value="0" step="0.1">
+            <input type="number" id="absorcaoProgressiva" placeholder="0" step="0.1">
           </div>
         </div>
 
@@ -585,11 +628,11 @@
           <div class="distribution-group">
             <div class="form-group">
               <label>Venda Direta (%)</label>
-              <input type="number" id="percVendasDiretas" value="0" step="0.1">
+              <input type="number" id="percVendasDiretas" placeholder="0" step="0.1">
             </div>
             <div class="form-group">
               <label>iFood (%)</label>
-              <input type="number" id="percVendasIfood" value="0" step="0.1">
+              <input type="number" id="percVendasIfood" placeholder="0" step="0.1">
             </div>
             <div class="dist-total">
               Total: <span id="distTotal">0.0%</span>
@@ -629,17 +672,51 @@
       </div>
     </div>
 
-    <!-- Panel 2: Produtos -->
-    <div id="panel-products" class="panel">
+    <!-- Panel 2: Ingredientes -->
+    <div id="panel-ingredients" class="panel">
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">🍪 Produtos</div>
-            <div class="card-subtitle">Cadastre e gerencie seus produtos</div>
+            <div class="card-title">🥚 Ingredientes</div>
+            <div class="card-subtitle">Cadastre os ingredientes que você utiliza</div>
+          </div>
+          <button class="btn btn-primary" id="btnAddIngredient">
+            ➕ Novo Ingrediente
+          </button>
+        </div>
+
+        <div id="ingredientsContainer"></div>
+      </div>
+    </div>
+
+    <!-- Panel 3: Receitas -->
+    <div id="panel-recipes" class="panel">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🍰 Receitas</div>
+            <div class="card-subtitle">Crie receitas usando seus ingredientes</div>
+          </div>
+          <button class="btn btn-primary" id="btnAddRecipe">
+            ➕ Nova Receita
+          </button>
+        </div>
+
+        <div id="recipesContainer"></div>
+      </div>
+    </div>
+
+    <!-- Panel 4: Cardápio (Produtos) -->
+    <div id="panel-menu" class="panel">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📋 Cardápio</div>
+            <div class="card-subtitle">Monte seu cardápio com base nas receitas</div>
           </div>
           <div style="display: flex; gap: 12px; flex-wrap: wrap;">
             <button class="btn btn-primary" id="btnAddProduct">
-              ➕ Novo Produto
+              ➕ Novo Item
             </button>
             <button class="btn btn-secondary" id="btnNormalize">
               📊 Normalizar %
@@ -651,7 +728,7 @@
       </div>
     </div>
 
-    <!-- Panel 3: Resultados -->
+    <!-- Panel 5: Resultados -->
     <div id="panel-results" class="panel">
       <div class="card">
         <div class="card-header">
@@ -683,7 +760,7 @@
         <div class="divider"></div>
 
         <div>
-          <h3 style="margin-bottom: 16px;">📦 Quantidade Mínima por Produto</h3>
+          <h3 style="margin-bottom: 16px;">📦 Quantidade Mínima por Item</h3>
           <div id="qtdResult"></div>
         </div>
 
@@ -691,13 +768,13 @@
 
         <div class="charts-grid">
           <div class="card">
-            <h4 style="margin-bottom: 12px; color: var(--dark);">Participação dos Produtos</h4>
+            <h4 style="margin-bottom: 12px; color: var(--dark);">Participação dos Itens</h4>
             <div class="chart-container">
               <canvas id="participChart"></canvas>
             </div>
           </div>
           <div class="card">
-            <h4 style="margin-bottom: 12px; color: var(--dark);">CMV por Produto</h4>
+            <h4 style="margin-bottom: 12px; color: var(--dark);">CMV por Item</h4>
             <div class="chart-container">
               <canvas id="cmvChart"></canvas>
             </div>
@@ -710,10 +787,16 @@
   <!-- Tabs Navigation (Fixed Bottom) -->
   <nav class="tabs-nav">
     <button class="tab-btn active" data-tab="costs">
-      ⚙️ <span>Custos</span>
+      🏪 <span>Custos</span>
     </button>
-    <button class="tab-btn" data-tab="products">
-      🍰 <span>Produtos</span>
+    <button class="tab-btn" data-tab="ingredients">
+      🥚 <span>Ingredientes</span>
+    </button>
+    <button class="tab-btn" data-tab="recipes">
+      🍰 <span>Receitas</span>
+    </button>
+    <button class="tab-btn" data-tab="menu">
+      📋 <span>Cardápio</span>
     </button>
     <button class="tab-btn" data-tab="results">
       📊 <span>Resultados</span>
@@ -725,7 +808,7 @@
 
   <script>
     // ============ STATE ============
-    const STORAGE_KEY = 'doceria_precificacao_pro_v1';
+    const STORAGE_KEY = 'doceria_precificacao_complete_v1';
     let state = {
       config: {
         aluguel: '', energia: '', agua: '', internet: '', telefone: '', gas: '',
@@ -733,6 +816,8 @@
         percVendasIfood: '', absorcaoProgressiva: '', metaLucroMensal: ''
       },
       labor: [],
+      ingredients: [],
+      recipes: [],
       products: []
     };
 
@@ -800,51 +885,39 @@
         list.appendChild(item);
       });
 
-      // Events
       list.querySelectorAll('.lab-name').forEach(el => {
         el.addEventListener('input', e => {
-          const i = e.target.dataset.i;
-          state.labor[i].name = e.target.value;
-          saveState();
-          calculateLabor();
+          state.labor[e.target.dataset.i].name = e.target.value;
+          saveState(); calculateLabor();
         });
       });
 
       list.querySelectorAll('.lab-role').forEach(el => {
         el.addEventListener('input', e => {
-          const i = e.target.dataset.i;
-          state.labor[i].role = e.target.value;
-          saveState();
-          calculateLabor();
+          state.labor[e.target.dataset.i].role = e.target.value;
+          saveState(); calculateLabor();
         });
       });
 
       list.querySelectorAll('.lab-rate').forEach(el => {
         el.addEventListener('input', e => {
-          const i = e.target.dataset.i;
-          state.labor[i].hourlyRate = Number(e.target.value || 0);
-          saveState();
-          calculateLabor();
+          state.labor[e.target.dataset.i].hourlyRate = Number(e.target.value || 0);
+          saveState(); calculateLabor();
         });
       });
 
       list.querySelectorAll('.lab-hours').forEach(el => {
         el.addEventListener('input', e => {
-          const i = e.target.dataset.i;
-          state.labor[i].hoursMonth = Number(e.target.value || 0);
-          saveState();
-          calculateLabor();
+          state.labor[e.target.dataset.i].hoursMonth = Number(e.target.value || 0);
+          saveState(); calculateLabor();
         });
       });
 
       list.querySelectorAll('.lab-remove').forEach(btn => {
         btn.addEventListener('click', e => {
-          const i = Number(btn.dataset.i);
           if (confirm('Remover esta pessoa?')) {
-            state.labor.splice(i, 1);
-            saveState();
-            renderLabor();
-            calculateLabor();
+            state.labor.splice(Number(btn.dataset.i), 1);
+            saveState(); renderLabor(); calculateLabor();
           }
         });
       });
@@ -854,8 +927,7 @@
 
     function addLaborPerson() {
       state.labor.push({ name: '', role: '', hourlyRate: '', hoursMonth: '' });
-      saveState();
-      renderLabor();
+      saveState(); renderLabor();
     }
 
     function getLaborTotals() {
@@ -893,7 +965,7 @@
       $('percVendasIfood').value = c.percVendasIfood || '';
       $('absorcaoProgressiva').value = c.absorcaoProgressiva || '';
       $('metaLucroMensal').value = c.metaLucroMensal || '';
-  updateDistributionTotal();
+      updateDistributionTotal();
     }
 
     function syncConfigFromDOM() {
@@ -933,7 +1005,289 @@
       return getFixedCostsOperational() + getLaborTotals().totalCost;
     }
 
-    // ============ PRODUCTS ============
+    // ============ INGREDIENTS ============
+    function renderIngredients() {
+      const cont = $('ingredientsContainer');
+      cont.innerHTML = '';
+
+      if (state.ingredients.length === 0) {
+        cont.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🥚</div>
+            <p>Nenhum ingrediente cadastrado ainda</p>
+          </div>
+        `;
+        return;
+      }
+
+      state.ingredients.forEach((ing, i) => {
+        const item = document.createElement('div');
+        item.className = 'ingredient-item';
+        item.innerHTML = `
+          <input data-i="${i}" class="ing-name" placeholder="Nome do ingrediente" value="${escapeHtml(ing.name || '')}" />
+          <input data-i="${i}" class="ing-qty" type="number" placeholder="Qtd" value="${ing.quantity || ''}" />
+          <select data-i="${i}" class="ing-unit">
+            <option value="g" ${ing.unit === 'g' ? 'selected' : ''}>g</option>
+            <option value="kg" ${ing.unit === 'kg' ? 'selected' : ''}>kg</option>
+            <option value="ml" ${ing.unit === 'ml' ? 'selected' : ''}>ml</option>
+            <option value="L" ${ing.unit === 'L' ? 'selected' : ''}>L</option>
+            <option value="un" ${ing.unit === 'un' ? 'selected' : ''}>un</option>
+          </select>
+          <input data-i="${i}" class="ing-price" type="number" placeholder="R$ Preço" value="${ing.price || ''}" step="0.01" />
+          <button class="btn btn-danger btn-sm ing-remove" data-i="${i}">🗑️</button>
+        `;
+        cont.appendChild(item);
+      });
+
+      cont.querySelectorAll('.ing-name').forEach(el => {
+        el.addEventListener('input', e => {
+          state.ingredients[e.target.dataset.i].name = e.target.value;
+          saveState();
+        });
+      });
+
+      cont.querySelectorAll('.ing-qty').forEach(el => {
+        el.addEventListener('input', e => {
+          state.ingredients[e.target.dataset.i].quantity = Number(e.target.value || 0);
+          saveState();
+        });
+      });
+
+      cont.querySelectorAll('.ing-unit').forEach(el => {
+        el.addEventListener('change', e => {
+          state.ingredients[e.target.dataset.i].unit = e.target.value;
+          saveState();
+        });
+      });
+
+      cont.querySelectorAll('.ing-price').forEach(el => {
+        el.addEventListener('input', e => {
+          state.ingredients[e.target.dataset.i].price = Number(e.target.value || 0);
+          saveState();
+        });
+      });
+
+      cont.querySelectorAll('.ing-remove').forEach(btn => {
+        btn.addEventListener('click', e => {
+          if (confirm('Remover este ingrediente?')) {
+            state.ingredients.splice(Number(btn.dataset.i), 1);
+            saveState(); renderIngredients();
+          }
+        });
+      });
+    }
+
+    function addIngredient() {
+      state.ingredients.push({ id: genId(), name: '', quantity: '', unit: 'g', price: '' });
+      saveState(); renderIngredients();
+    }
+
+    // ============ RECIPES ============
+    function renderRecipes() {
+      const cont = $('recipesContainer');
+      cont.innerHTML = '';
+
+      if (state.recipes.length === 0) {
+        cont.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🍰</div>
+            <p>Nenhuma receita cadastrada ainda</p>
+          </div>
+        `;
+        return;
+      }
+
+      state.recipes.forEach((rec, idx) => {
+        const totalCost = calculateRecipeCost(rec);
+        const item = document.createElement('div');
+        item.className = 'recipe-item';
+        item.innerHTML = `
+          <div class="recipe-info">
+            <div class="recipe-name">${escapeHtml(rec.name || 'Receita')}</div>
+            <div class="recipe-meta">
+              Rendimento: ${rec.yield || 0} un • 
+              Ingredientes: ${rec.ingredients.length} • 
+              Custo Total: <strong>${money(totalCost)}</strong>
+            </div>
+          </div>
+          <div class="recipe-actions">
+            <button class="btn btn-secondary btn-sm" data-idx="${idx}" data-action="edit">✏️ Editar</button>
+            <button class="btn btn-secondary btn-sm" data-idx="${idx}" data-action="dup">📋 Duplicar</button>
+            <button class="btn btn-danger btn-sm" data-idx="${idx}" data-action="remove">🗑️</button>
+          </div>
+        `;
+        cont.appendChild(item);
+      });
+
+      cont.querySelectorAll('button').forEach(btn => {
+        const idx = Number(btn.dataset.idx);
+        const act = btn.dataset.action;
+        btn.addEventListener('click', () => {
+          if (act === 'edit') openRecipeModal(idx);
+          if (act === 'dup') duplicateRecipe(idx);
+          if (act === 'remove') {
+            if (confirm('Remover esta receita?')) {
+              state.recipes.splice(idx, 1);
+              saveState(); renderRecipes();
+            }
+          }
+        });
+      });
+    }
+
+    function calculateRecipeCost(recipe) {
+      let total = 0;
+      recipe.ingredients.forEach(recIng => {
+        const ing = state.ingredients.find(i => i.id === recIng.ingredientId);
+        if (!ing) return;
+        const unitPrice = Number(ing.price || 0) / Number(ing.quantity || 1);
+        total += unitPrice * Number(recIng.quantity || 0);
+      });
+      return total;
+    }
+
+    function duplicateRecipe(i) {
+      const copy = JSON.parse(JSON.stringify(state.recipes[i]));
+      copy.id = genId();
+      copy.name = copy.name + ' (cópia)';
+      state.recipes.push(copy);
+      saveState(); renderRecipes();
+    }
+
+    function openRecipeModal(index) {
+      const isNew = index === undefined || index === null;
+      const recipe = isNew ? {
+        id: genId(),
+        name: 'Receita',
+        yield: 1,
+        ingredients: []
+      } : JSON.parse(JSON.stringify(state.recipes[index]));
+
+      const root = $('modalRoot');
+      root.innerHTML = `
+        <div class="modal-backdrop">
+          <div class="modal">
+            <h3>${isNew ? '➕ Nova Receita' : '✏️ Editar Receita'}</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Nome da Receita</label>
+                <input id="r_name" type="text" value="${escapeHtml(recipe.name)}" />
+              </div>
+              <div class="form-group">
+                <label>Rendimento (unidades)</label>
+                <input id="r_yield" type="number" value="${recipe.yield || 1}" />
+              </div>
+            </div>
+
+            <div class="recipe-ingredients-section">
+              <h4 style="margin-bottom: 16px;">Ingredientes da Receita</h4>
+              
+              <div class="add-ingredient-row">
+                <select id="r_ing_select">
+                  <option value="">Selecione um ingrediente</option>
+                  ${state.ingredients.map(ing => `
+                    <option value="${ing.id}">${escapeHtml(ing.name)} (${ing.quantity}${ing.unit})</option>
+                  `).join('')}
+                </select>
+                <input id="r_ing_qty" type="number" placeholder="Quantidade" step="0.01" />
+                <button class="btn btn-secondary btn-sm" id="r_add_ing">➕ Adicionar</button>
+              </div>
+
+              <div id="r_ingredients_list"></div>
+
+              <div style="margin-top: 16px; padding: 16px; background: var(--bg); border-radius: var(--radius);">
+                <strong>Custo Total da Receita:</strong> <span id="r_total_cost">R$ 0,00</span>
+              </div>
+            </div>
+
+            <div class="modal-actions">
+              <button class="btn btn-primary" id="r_save">💾 Salvar</button>
+              <button class="btn btn-secondary" id="r_close">❌ Cancelar</button>
+            </div>
+          </div>
+        </div>
+      `;
+      root.style.display = 'block';
+
+      function updateRecipeIngredientsList() {
+        const list = document.getElementById('r_ingredients_list');
+        list.innerHTML = '';
+
+        let totalCost = 0;
+
+        recipe.ingredients.forEach((recIng, i) => {
+          const ing = state.ingredients.find(x => x.id === recIng.ingredientId);
+          if (!ing) return;
+
+          const unitPrice = Number(ing.price || 0) / Number(ing.quantity || 1);
+          const cost = unitPrice * Number(recIng.quantity || 0);
+          totalCost += cost;
+
+          const item = document.createElement('div');
+          item.className = 'recipe-ingredient-item';
+          item.innerHTML = `
+            <div>${escapeHtml(ing.name)} - ${recIng.quantity}${ing.unit} (${money(cost)})</div>
+            <div></div>
+            <button class="btn btn-danger btn-sm" data-i="${i}">🗑️</button>
+          `;
+          list.appendChild(item);
+        });
+
+        list.querySelectorAll('button').forEach(btn => {
+          btn.addEventListener('click', () => {
+            recipe.ingredients.splice(Number(btn.dataset.i), 1);
+            updateRecipeIngredientsList();
+          });
+        });
+
+        document.getElementById('r_total_cost').textContent = money(totalCost);
+      }
+
+      updateRecipeIngredientsList();
+
+      document.getElementById('r_add_ing').addEventListener('click', () => {
+        const ingId = document.getElementById('r_ing_select').value;
+        const qty = Number(document.getElementById('r_ing_qty').value || 0);
+        
+        if (!ingId) {
+          alert('Selecione um ingrediente');
+          return;
+        }
+        if (qty <= 0) {
+          alert('Informe uma quantidade válida');
+          return;
+        }
+
+        recipe.ingredients.push({ ingredientId: ingId, quantity: qty });
+        document.getElementById('r_ing_select').value = '';
+        document.getElementById('r_ing_qty').value = '';
+        updateRecipeIngredientsList();
+      });
+
+      $('r_close').addEventListener('click', () => {
+        root.style.display = 'none';
+        root.innerHTML = '';
+      });
+
+      $('r_save').addEventListener('click', () => {
+        recipe.name = document.getElementById('r_name').value || 'Receita';
+        recipe.yield = Number(document.getElementById('r_yield').value || 1);
+
+        if (recipe.ingredients.length === 0) {
+          alert('Adicione pelo menos um ingrediente à receita');
+          return;
+        }
+
+        if (isNew) state.recipes.push(recipe);
+        else state.recipes[index] = recipe;
+        
+        saveState(); renderRecipes();
+        root.style.display = 'none';
+        root.innerHTML = '';
+      });
+    }
+
+    // ============ PRODUCTS (MENU) ============
     function renderProductsList() {
       const cont = $('productsContainer');
       cont.innerHTML = '';
@@ -941,8 +1295,8 @@
       if (state.products.length === 0) {
         cont.innerHTML = `
           <div class="empty-state">
-            <div class="empty-state-icon">🍪</div>
-            <p>Nenhum produto cadastrado ainda</p>
+            <div class="empty-state-icon">📋</div>
+            <p>Nenhum item no cardápio ainda</p>
           </div>
         `;
         return;
@@ -953,9 +1307,9 @@
         item.className = 'product-item';
         item.innerHTML = `
           <div class="product-info">
-            <div class="product-name">${escapeHtml(p.name || 'Produto')}</div>
+            <div class="product-name">${escapeHtml(p.name || 'Item')}</div>
             <div class="product-meta">
-              Rendimento: ${p.unitsPerRecipe || 0} un • 
+              Receita: ${getRecipeName(p.recipeId)} • 
               Embalagem: ${p.unitsPerPackage || 0} un • 
               Tempo: ${p.productionTimeHours || 0}h • 
               Participação: ${p.participationPercent || 0}%
@@ -977,32 +1331,18 @@
           if (act === 'edit') openProductModal(idx);
           if (act === 'dup') duplicateProduct(idx);
           if (act === 'remove') {
-            if (confirm('Remover este produto?')) {
+            if (confirm('Remover este item?')) {
               state.products.splice(idx, 1);
-              saveState();
-              renderProductsList();
-              calculateResults();
+              saveState(); renderProductsList(); calculateResults();
             }
           }
         });
       });
     }
 
-    function addEmptyProduct() {
-      state.products.push({
-        id: genId(),
-        name: 'Produto',
-        unitsPerRecipe: 1,
-        unitsPerPackage: 1,
-        ingredientCost: 0,
-        packagingCost: 0,
-        productionTimeHours: 0,
-        participationPercent: 0,
-        marginPercent: 0
-      });
-      saveState();
-      renderProductsList();
-      calculateResults();
+    function getRecipeName(recipeId) {
+      const rec = state.recipes.find(r => r.id === recipeId);
+      return rec ? rec.name : 'Nenhuma';
     }
 
     function duplicateProduct(i) {
@@ -1010,19 +1350,16 @@
       copy.id = genId();
       copy.name = copy.name + ' (cópia)';
       state.products.push(copy);
-      saveState();
-      renderProductsList();
-      calculateResults();
+      saveState(); renderProductsList(); calculateResults();
     }
 
     function openProductModal(index) {
       const isNew = index === undefined || index === null;
       const product = isNew ? {
         id: genId(),
-        name: 'Produto',
-        unitsPerRecipe: 1,
+        name: 'Item',
+        recipeId: '',
         unitsPerPackage: 1,
-        ingredientCost: 0,
         packagingCost: 0,
         productionTimeHours: 0,
         participationPercent: 0,
@@ -1033,39 +1370,46 @@
       root.innerHTML = `
         <div class="modal-backdrop">
           <div class="modal">
-            <h3>${isNew ? '➕ Novo Produto' : '✏️ Editar Produto'}</h3>
+            <h3>${isNew ? '➕ Novo Item do Cardápio' : '✏️ Editar Item'}</h3>
             <div class="form-grid">
               <div class="form-group">
-                <label>Nome do Produto</label>
+                <label>Nome do Item</label>
                 <input id="m_name" type="text" value="${escapeHtml(product.name)}" />
               </div>
               <div class="form-group">
-                <label>Participação (%)</label>
-                <input id="m_part" type="number" step="0.1" value="${Number(product.participationPercent || 0)}" />
+                <label>Receita</label>
+                <select id="m_recipe">
+                  <option value="">Selecione uma receita</option>
+                  ${state.recipes.map(rec => `
+                    <option value="${rec.id}" ${product.recipeId === rec.id ? 'selected' : ''}>
+                      ${escapeHtml(rec.name)}
+                    </option>
+                  `).join('')}
+                </select>
               </div>
               <div class="form-group">
-                <label>Unidades/Receita</label>
-                <input id="m_units" type="number" value="${Number(product.unitsPerRecipe || 1)}" />
+                <label>Participação (%)</label>
+                <input id="m_part" type="number" step="0.1" value="${product.participationPercent || 0}" />
               </div>
               <div class="form-group">
                 <label>Unidades/Embalagem</label>
-                <input id="m_unitsPack" type="number" value="${Number(product.unitsPerPackage || 1)}" />
+                <input id="m_unitsPack" type="number" value="${product.unitsPerPackage || 1}" />
               </div>
               <div class="form-group">
-                <label>Custo Ingredientes (R$)</label>
-                <input id="m_ing" type="number" step="0.01" value="${Number(product.ingredientCost || 0)}" />
+                <label>Custo Ingredientes (R$) - Automático</label>
+                <input id="m_ing" type="number" step="0.01" value="0" disabled />
               </div>
               <div class="form-group">
                 <label>Custo Embalagem (R$)</label>
-                <input id="m_pack" type="number" step="0.01" value="${Number(product.packagingCost || 0)}" />
+                <input id="m_pack" type="number" step="0.01" value="${product.packagingCost || 0}" />
               </div>
               <div class="form-group">
                 <label>Tempo Produção (h)</label>
-                <input id="m_time" type="number" step="0.1" value="${Number(product.productionTimeHours || 0)}" />
+                <input id="m_time" type="number" step="0.1" value="${product.productionTimeHours || 0}" />
               </div>
               <div class="form-group">
                 <label>Margem (%)</label>
-                <input id="m_margin" type="number" step="0.1" value="${Number(product.marginPercent || 0)}" />
+                <input id="m_margin" type="number" step="0.1" value="${product.marginPercent || 0}" />
               </div>
             </div>
             <div class="modal-actions">
@@ -1077,28 +1421,52 @@
       `;
       root.style.display = 'block';
 
+      function updateIngredientCost() {
+        const recipeId = document.getElementById('m_recipe').value;
+        if (!recipeId) {
+          document.getElementById('m_ing').value = 0;
+          return;
+        }
+        const recipe = state.recipes.find(r => r.id === recipeId);
+        if (!recipe) {
+          document.getElementById('m_ing').value = 0;
+          return;
+        }
+        const cost = calculateRecipeCost(recipe);
+        document.getElementById('m_ing').value = cost.toFixed(2);
+      }
+
+      updateIngredientCost();
+
+      document.getElementById('m_recipe').addEventListener('change', updateIngredientCost);
+
       $('m_close').addEventListener('click', () => {
         root.style.display = 'none';
         root.innerHTML = '';
       });
 
       $('m_save').addEventListener('click', () => {
+        const recipeId = document.getElementById('m_recipe').value;
+        if (!recipeId) {
+          alert('Selecione uma receita');
+          return;
+        }
+
         const newP = {
           id: product.id,
-          name: $('m_name').value || 'Produto',
-          unitsPerRecipe: Number($('m_units').value || 0),
-          unitsPerPackage: Number($('m_unitsPack').value || 0),
-          ingredientCost: Number($('m_ing').value || 0),
+          name: $('m_name').value || 'Item',
+          recipeId: recipeId,
+          unitsPerPackage: Number($('m_unitsPack').value || 1),
           packagingCost: Number($('m_pack').value || 0),
           productionTimeHours: Number($('m_time').value || 0),
           participationPercent: Number($('m_part').value || 0),
           marginPercent: Number($('m_margin').value || 0)
         };
+
         if (isNew) state.products.push(newP);
         else state.products[index] = newP;
-        saveState();
-        renderProductsList();
-        calculateResults();
+        
+        saveState(); renderProductsList(); calculateResults();
         root.style.display = 'none';
         root.innerHTML = '';
       });
@@ -1108,22 +1476,30 @@
     function calculatePerProduct(product) {
       const labor = getLaborTotals();
       const avgHourly = labor.avgHourly || 0;
+      
+      const recipe = state.recipes.find(r => r.id === product.recipeId);
+      const recipeCost = recipe ? calculateRecipeCost(recipe) : 0;
+      const recipeYield = recipe ? Number(recipe.yield || 1) : 1;
+      
+      const ingredientCostPerUnit = recipeCost / recipeYield;
+      
       const productionTime = Number(product.productionTimeHours || 0);
       const laborCostRecipe = productionTime * avgHourly;
-      const units = Number(product.unitsPerRecipe) || 1;
-      const laborCostPerUnit = units > 0 ? laborCostRecipe / units : 0;
-      const ingredientTotal = Number(product.ingredientCost || 0);
-      const ingredientPerUnit = units > 0 ? ingredientTotal / units : 0;
-      const costPerUnit = ingredientPerUnit + laborCostPerUnit;
-      const costPerPackage = (costPerUnit * (Number(product.unitsPerPackage) || 1)) + Number(product.packagingCost || 0);
+      const laborCostPerUnit = recipeYield > 0 ? laborCostRecipe / recipeYield : 0;
+      
+      const costPerUnit = ingredientCostPerUnit + laborCostPerUnit;
+      const costPerPackage = (costPerUnit * Number(product.unitsPerPackage || 1)) + Number(product.packagingCost || 0);
+      
       const absorcaoPct = Number(state.config.absorcaoProgressiva || 0) / 100;
       const fixedCostAbsorption = costPerPackage * absorcaoPct;
       const totalCostWithFixed = costPerPackage + fixedCostAbsorption;
+      
       const marginPct = Number(product.marginPercent || 0) / 100;
       const precoDireto = marginPct < 0.999 ? (totalCostWithFixed / (1 - marginPct)) : totalCostWithFixed;
+      
       const taxaIfood = Number(state.config.taxaIfood || 0) / 100;
       const precoIfood = taxaIfood < 0.999 ? (precoDireto / (1 - taxaIfood)) : precoDireto;
-      const precoMarkup3 = costPerPackage * 3;
+      
       const cmv = precoDireto > 0 ? (costPerPackage / precoDireto) * 100 : 0;
       const margemUnitaria = precoDireto - totalCostWithFixed;
 
@@ -1131,14 +1507,13 @@
         avgHourly,
         laborCostRecipe,
         laborCostPerUnit,
-        ingredientPerUnit,
+        ingredientCostPerUnit,
         costPerUnit,
         costPerPackage,
         fixedCostAbsorption,
         totalCostWithFixed,
         precoDireto,
         precoIfood,
-        precoMarkup3,
         cmv,
         margemUnitaria
       };
@@ -1169,7 +1544,7 @@
         qdiv.innerHTML = `
           <div class="empty-state">
             <div class="empty-state-icon">📦</div>
-            <p>Cadastre produtos para ver os resultados</p>
+            <p>Cadastre itens no cardápio para ver os resultados</p>
           </div>
         `;
         if (participationChart) {
@@ -1190,7 +1565,7 @@
         qdiv.innerHTML = `
           <div class="empty-state">
             <div class="empty-state-icon">⚠️</div>
-            <p>Defina as porcentagens de participação dos produtos</p>
+            <p>Defina as porcentagens de participação dos itens</p>
           </div>
         `;
         if (participationChart) {
@@ -1243,7 +1618,7 @@
         `;
         qdiv.appendChild(box);
 
-        labels.push(p.name || 'Produto');
+        labels.push(p.name || 'Item');
         dataPct.push(particip);
         dataCMV.push(calc.cmv);
       });
@@ -1330,7 +1705,11 @@
     }
 
     function attachButtons() {
+      $('btnAddLabor').addEventListener('click', () => addLaborPerson());
+      $('btnAddIngredient').addEventListener('click', () => addIngredient());
+      $('btnAddRecipe').addEventListener('click', () => openRecipeModal());
       $('btnAddProduct').addEventListener('click', () => openProductModal());
+      
       $('btnNormalize').addEventListener('click', () => {
         let sum = 0;
         state.products.forEach(p => sum += Number(p.participationPercent || 0));
@@ -1345,7 +1724,6 @@
         renderProductsList();
         calculateResults();
       });
-      $('btnAddLabor').addEventListener('click', () => addLaborPerson());
 
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -1360,7 +1738,9 @@
         b.classList.toggle('active', b.dataset.tab === name);
       });
       $('panel-costs').classList.toggle('active', name === 'costs');
-      $('panel-products').classList.toggle('active', name === 'products');
+      $('panel-ingredients').classList.toggle('active', name === 'ingredients');
+      $('panel-recipes').classList.toggle('active', name === 'recipes');
+      $('panel-menu').classList.toggle('active', name === 'menu');
       $('panel-results').classList.toggle('active', name === 'results');
       if (name === 'results') calculateResults();
     }
@@ -1369,6 +1749,8 @@
     window.addEventListener('load', () => {
       renderConfig();
       renderLabor();
+      renderIngredients();
+      renderRecipes();
       renderProductsList();
       attachInputSync();
       attachButtons();
