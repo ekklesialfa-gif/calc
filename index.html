@@ -728,9 +728,9 @@
     const STORAGE_KEY = 'doceria_precificacao_pro_v1';
     let state = {
       config: {
-        aluguel: 0, energia: 0, agua: 0, internet: 0, telefone: 0, gas: 0,
-        marketing: 0, taxasApps: 0, taxaIfood: 0, percVendasDiretas: 0,
-        percVendasIfood: 0, absorcaoProgressiva: 0, metaLucroMensal: 0
+        aluguel: '', energia: '', agua: '', internet: '', telefone: '', gas: '',
+        marketing: '', taxasApps: '', taxaIfood: '', percVendasDiretas: '',
+        percVendasIfood: '', absorcaoProgressiva: '', metaLucroMensal: ''
       },
       labor: [],
       products: []
@@ -793,8 +793,8 @@
         item.innerHTML = `
           <input data-i="${i}" class="lab-name" placeholder="Nome" value="${escapeHtml(l.name || '')}" />
           <input data-i="${i}" class="lab-role" placeholder="Função" value="${escapeHtml(l.role || '')}" />
-          <input data-i="${i}" class="lab-rate" type="number" placeholder="R$/h" value="${l.hourlyRate || 0}" />
-          <input data-i="${i}" class="lab-hours" type="number" placeholder="h/mês" value="${l.hoursMonth || 0}" />
+          <input data-i="${i}" class="lab-rate" type="number" placeholder="R$/h" value="${l.hourlyRate || ''}" />
+          <input data-i="${i}" class="lab-hours" type="number" placeholder="h/mês" value="${l.hoursMonth || ''}" />
           <button class="btn btn-danger btn-sm lab-remove" data-i="${i}">🗑️</button>
         `;
         list.appendChild(item);
@@ -853,7 +853,7 @@
     }
 
     function addLaborPerson() {
-      state.labor.push({ name: '', role: '', hourlyRate: 0, hoursMonth: 0 });
+      state.labor.push({ name: '', role: '', hourlyRate: '', hoursMonth: '' });
       saveState();
       renderLabor();
     }
@@ -880,20 +880,20 @@
     // ============ CONFIG ============
     function renderConfig() {
       const c = state.config;
-      $('aluguel').value = c.aluguel || 0;
-      $('energia').value = c.energia || 0;
-      $('agua').value = c.agua || 0;
-      $('internet').value = c.internet || 0;
-      $('telefone').value = c.telefone || 0;
-      $('gas').value = c.gas || 0;
-      $('marketing').value = c.marketing || 0;
-      $('taxasApps').value = c.taxasApps || 0;
-      $('taxaIfood').value = c.taxaIfood || 0;
-      $('percVendasDiretas').value = c.percVendasDiretas || 0;
-      $('percVendasIfood').value = c.percVendasIfood || 0;
-      $('absorcaoProgressiva').value = c.absorcaoProgressiva || 0;
-      $('metaLucroMensal').value = c.metaLucroMensal || 0;
-      updateDistributionTotal();
+      $('aluguel').value = c.aluguel || '';
+      $('energia').value = c.energia || '';
+      $('agua').value = c.agua || '';
+      $('internet').value = c.internet || '';
+      $('telefone').value = c.telefone || '';
+      $('gas').value = c.gas || '';
+      $('marketing').value = c.marketing || '';
+      $('taxasApps').value = c.taxasApps || '';
+      $('taxaIfood').value = c.taxaIfood || '';
+      $('percVendasDiretas').value = c.percVendasDiretas || '';
+      $('percVendasIfood').value = c.percVendasIfood || '';
+      $('absorcaoProgressiva').value = c.absorcaoProgressiva || '';
+      $('metaLucroMensal').value = c.metaLucroMensal || '';
+  updateDistributionTotal();
     }
 
     function syncConfigFromDOM() {
