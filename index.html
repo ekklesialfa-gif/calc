@@ -193,11 +193,16 @@
 
     /* Form Grid */
     .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
+       display: grid;
+       grid-template-columns: repeat(2, 1fr);
+       gap: 16px;
     }
-
+ 
+    @media (max-width: 480px) {
+    .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
     .form-group {
       display: flex;
       flex-direction: column;
@@ -856,79 +861,128 @@
         .replace(/>/g, '&gt;');
     }
 
-    // ============ LABOR ============
-    function renderLabor() {
-      const list = $('laborList');
-      list.innerHTML = '';
-
-      if (state.labor.length === 0) {
-        list.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">👥</div>
-            <p>Nenhuma pessoa cadastrada ainda</p>
-          </div>
-        `;
-        calculateLabor();
-        return;
+ // ============ LABOR ============
+function renderLabor() {
+  const list = $('laborList');
+  list.innerHTML = '';
+  
+  if (state.labor.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">👥</div>
+        <p>Nenhuma pessoa cadastrada ainda</p>
+      </div>
+    `;
+    calculateLabor();
+    return;
+  }
+  
+  state.labor.forEach((l, i) => {
+    const item = document.createElement('div');
+    item.className = 'product-item';
+    item.innerHTML = `
+      <div class="product-info">
+        <div class="product-name">${escapeHtml(l.name || 'Pessoa')}</div>
+        <div class="product-meta">
+          ${escapeHtml(l.role || 'Sem função')} • 
+          R$ ${Number(l.hourlyRate || 0).toFixed(2)}/h • 
+          ${Number(l.hoursMonth || 0)}h/mês
+        </div>
+      </div>
+      <div class="product-actions">
+        <button class="btn btn-secondary btn-sm lab-edit" data-i="${i}">✏️ Editar</button>
+        <button class="btn btn-danger btn-sm lab-remove" data-i="${i}">🗑️</button>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+  
+  list.querySelectorAll('.lab-edit').forEach(btn => {
+    btn.addEventListener('click', () => {
+      openLaborModal(Number(btn.dataset.i));
+    });
+  });
+  
+  list.querySelectorAll('.lab-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (confirm('Remover esta pessoa?')) {
+        state.labor.splice(Number(btn.dataset.i), 1);
+        saveState(); renderLabor(); calculateLabor();
       }
+    });
+  });
+  
+  calculateLabor();
+} 
 
-      state.labor.forEach((l, i) => {
-        const item = document.createElement('div');
-        item.className = 'labor-item';
-        item.innerHTML = `
-          <input data-i="${i}" class="lab-name" placeholder="Nome" value="${escapeHtml(l.name || '')}" />
-          <input data-i="${i}" class="lab-role" placeholder="Função" value="${escapeHtml(l.role || '')}" />
-          <input data-i="${i}" class="lab-rate" type="number" placeholder="R$/h" value="${l.hourlyRate || ''}" />
-          <input data-i="${i}" class="lab-hours" type="number" placeholder="h/mês" value="${l.hoursMonth || ''}" />
-          <button class="btn btn-danger btn-sm lab-remove" data-i="${i}">🗑️</button>
-        `;
-        list.appendChild(item);
-      });
-
-      list.querySelectorAll('.lab-name').forEach(el => {
-        el.addEventListener('input', e => {
-          state.labor[e.target.dataset.i].name = e.target.value;
-          saveState(); calculateLabor();
-        });
-      });
-
-      list.querySelectorAll('.lab-role').forEach(el => {
-        el.addEventListener('input', e => {
-          state.labor[e.target.dataset.i].role = e.target.value;
-          saveState(); calculateLabor();
-        });
-      });
-
-      list.querySelectorAll('.lab-rate').forEach(el => {
-        el.addEventListener('input', e => {
-          state.labor[e.target.dataset.i].hourlyRate = Number(e.target.value || 0);
-          saveState(); calculateLabor();
-        });
-      });
-
-      list.querySelectorAll('.lab-hours').forEach(el => {
-        el.addEventListener('input', e => {
-          state.labor[e.target.dataset.i].hoursMonth = Number(e.target.value || 0);
-          saveState(); calculateLabor();
-        });
-      });
-
-      list.querySelectorAll('.lab-remove').forEach(btn => {
-        btn.addEventListener('click', e => {
-          if (confirm('Remover esta pessoa?')) {
-            state.labor.splice(Number(btn.dataset.i), 1);
-            saveState(); renderLabor(); calculateLabor();
-          }
-        });
-      });
-
-      calculateLabor();
+function openLaborModal(index) {
+  const isNew = index === undefined || index === null;
+  const person = isNew ? {
+    name: '', role: '', hourlyRate: '', hoursMonth: ''
+  } : JSON.parse(JSON.stringify(state.labor[index]));
+  
+  const root = $('modalRoot');
+  root.innerHTML = `
+    <div class="modal-backdrop">
+      <div class="modal">
+        <h3>${isNew ? '➕ Nova Pessoa' : '✏️ Editar Pessoa'}</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nome</label>
+            <input id="l_name" type="text" placeholder="Nome" value="${escapeHtml(person.name || '')}" />
+          </div>
+          <div class="form-group">
+            <label>Função</label>
+            <input id="l_role" type="text" placeholder="Função" value="${escapeHtml(person.role || '')}" />
+          </div>
+          <div class="form-group">
+            <label>R$ por Hora</label>
+            <input id="l_rate" type="number" placeholder="0,00" value="${person.hourlyRate || ''}" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label>Horas por Mês</label>
+            <input id="l_hours" type="number" placeholder="0" value="${person.hoursMonth || ''}" />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="l_save">💾 Salvar</button>
+          <button class="btn btn-secondary" id="l_close">❌ Cancelar</button>
+        </div>
+      </div>
+    </div>
+  `;
+  root.style.display = 'block';
+  
+  $('l_close').addEventListener('click', () => {
+    root.style.display = 'none';
+    root.innerHTML = '';
+  });
+  
+  $('l_save').addEventListener('click', () => {
+    const newPerson = {
+      name: $('l_name').value || '',
+      role: $('l_role').value || '',
+      hourlyRate: Number($('l_rate').value || 0),
+      hoursMonth: Number($('l_hours').value || 0)
+    };
+    
+    if (!newPerson.name) {
+      alert('Informe o nome da pessoa');
+      return;
     }
+    
+    if (isNew) state.labor.push(newPerson);
+    else state.labor[index] = newPerson;
+    
+    saveState(); renderLabor(); calculateLabor();
+    root.style.display = 'none';
+    root.innerHTML = '';
+  });
+} 
 
-    function addLaborPerson() {
-      state.labor.push({ name: '', role: '', hourlyRate: '', hoursMonth: '' });
-      saveState(); renderLabor();
-    }
+function addLaborPerson() {
+  openLaborModal();
+} 
 
     function getLaborTotals() {
       let totalHours = 0, totalCost = 0;
