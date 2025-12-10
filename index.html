@@ -35,11 +35,38 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #ffc3a0 0%, #ffafbd 100%);
       min-height: 100vh;
       color: var(--dark);
       padding: 0;
       overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '🍰 🧁 🍪 🍩 🎂 🍮 🍭 🍬 🍫 🍓';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      font-size: 50px;
+      line-height: 100px;
+      word-wrap: break-word;
+      opacity: 0.08;
+      z-index: 0;
+      pointer-events: none;
+      animation: float 60s linear infinite;
+      letter-spacing: 40px;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0) rotate(0deg);
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+      }
     }
 
     .app-container {
@@ -47,9 +74,10 @@
       margin: 0 auto;
       padding: 20px;
       padding-bottom: 100px;
+      position: relative;
+      z-index: 1;
     }
 
-    /* Header */
     .header {
       background: var(--bg-card);
       border-radius: var(--radius-lg);
@@ -85,7 +113,6 @@
       color: var(--gray);
     }
 
-    /* Tabs Navigation */
     .tabs-nav {
       position: fixed;
       bottom: 20px;
@@ -140,7 +167,6 @@
       box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
     }
 
-    /* Panels */
     .panel {
       display: none;
       animation: fadeIn 0.3s ease;
@@ -161,7 +187,6 @@
       }
     }
 
-    /* Card */
     .card {
       background: var(--bg-card);
       border-radius: var(--radius-lg);
@@ -191,55 +216,57 @@
       margin-top: 4px;
     }
 
-    /* Form Grid */
- .form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
 
-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--dark);
-}
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--dark);
+    }
 
-input, select, textarea {
-  padding: 8px 10px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius);
-  font-size: 13px;
-  font-family: inherit;
-  transition: all 0.2s ease;
-  background: var(--bg);
-}
+    input, select, textarea {
+      padding: 8px 10px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      background: var(--bg);
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
 
-/* Desktop - aumenta os espaços */
-@media (min-width: 769px) {
-  .form-grid {
-    gap: 16px;
-    max-width: 800px;
-  }
-  
-  .form-group {
-    gap: 6px;
-  }
-  
-  label {
-    font-size: 14px;
-  }
-  
-  input, select, textarea {
-    padding: 10px 12px;
-    font-size: 14px;
-  }
-}
+    @media (min-width: 769px) {
+      .form-grid {
+        gap: 16px;
+        max-width: 800px;
+      }
+      
+      .form-group {
+        gap: 6px;
+      }
+      
+      label {
+        font-size: 14px;
+      }
+      
+      input, select, textarea {
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+    }
 
     input:focus, select:focus, textarea:focus {
       outline: none;
@@ -253,7 +280,6 @@ input, select, textarea {
       opacity: 0.6;
     }
 
-    /* Buttons */
     .btn {
       padding: 12px 24px;
       border: none;
@@ -299,7 +325,6 @@ input, select, textarea {
       font-size: 13px;
     }
 
-    /* Stats Grid */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -325,7 +350,6 @@ input, select, textarea {
       font-weight: 700;
     }
 
-    /* Labor/Ingredient/Recipe Items */
     .labor-item, .ingredient-item, .recipe-ingredient-item {
       display: grid;
       grid-template-columns: 1fr 1fr 100px 100px auto;
@@ -345,7 +369,6 @@ input, select, textarea {
       grid-template-columns: 2fr 150px auto;
     }
 
-    /* Product/Recipe List */
     .product-item, .recipe-item {
       display: flex;
       justify-content: space-between;
@@ -375,9 +398,9 @@ input, select, textarea {
     .product-actions, .recipe-actions {
       display: flex;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
-    /* Modal */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -412,9 +435,9 @@ input, select, textarea {
       gap: 12px;
       justify-content: flex-end;
       margin-top: 24px;
+      flex-wrap: wrap;
     }
 
-    /* Charts */
     .chart-container {
       position: relative;
       height: 250px;
@@ -427,7 +450,6 @@ input, select, textarea {
       gap: 20px;
     }
 
-    /* Distribution Inputs */
     .distribution-group {
       display: grid;
       grid-template-columns: 1fr 1fr auto;
@@ -445,7 +467,6 @@ input, select, textarea {
       white-space: nowrap;
     }
 
-    /* Recipe Ingredients Section */
     .recipe-ingredients-section {
       margin-top: 20px;
       padding-top: 20px;
@@ -459,90 +480,87 @@ input, select, textarea {
       margin-bottom: 16px;
     }
 
-    /* Responsive */
-   @media (max-width: 768px) {
-  .app-container {
-    padding: 12px;
-    padding-bottom: 100px;
-  }
+    @media (max-width: 768px) {
+      .app-container {
+        padding: 12px;
+        padding-bottom: 100px;
+      }
 
-  .header {
-    padding: 16px;
-  }
+      .header {
+        padding: 16px;
+      }
 
-  .header-icon {
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
-  }
+      .header-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+      }
 
-  .header-content h1 {
-    font-size: 20px;
-  }
+      .header-content h1 {
+        font-size: 20px;
+      }
 
-  .card {
-    padding: 16px;
-  }
+      .card {
+        padding: 16px;
+      }
 
-  .labor-item, .ingredient-item, .recipe-ingredient-item {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
+      .labor-item, .ingredient-item, .recipe-ingredient-item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
 
-  .add-ingredient-row {
-    grid-template-columns: 1fr;
-  }
+      .add-ingredient-row {
+        grid-template-columns: 1fr;
+      }
 
-  .product-item, .recipe-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+      .product-item, .recipe-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
 
-  .product-actions, .recipe-actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
+      .product-actions, .recipe-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
 
-  .tabs-nav {
-    width: calc(100% - 24px);
-    bottom: 12px;
-  }
+      .tabs-nav {
+        width: calc(100% - 24px);
+        bottom: 12px;
+      }
 
-  .tab-btn {
-    padding: 10px 8px;
-    font-size: 11px;
-    gap: 4px;
-  }
+      .tab-btn {
+        padding: 10px 8px;
+        font-size: 11px;
+        gap: 4px;
+      }
 
-  .tab-btn span {
-    display: none;
-  }
+      .tab-btn span {
+        display: none;
+      }
 
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
 
-  .distribution-group {
-    grid-template-columns: 1fr;
-  }
+      .distribution-group {
+        grid-template-columns: 1fr;
+      }
 
-  .modal {
-    padding: 24px;
-  }
+      .modal {
+        padding: 24px;
+      }
 
-  .charts-grid {
-    grid-template-columns: 1fr;
-  }
-}
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
 
-    /* Divider */
     .divider {
       height: 1px;
       background: var(--border);
       margin: 24px 0;
     }
 
-    /* Empty State */
     .empty-state {
       text-align: center;
       padding: 40px 20px;
@@ -555,7 +573,6 @@ input, select, textarea {
       opacity: 0.5;
     }
 
-    /* Badge */
     .badge {
       display: inline-block;
       padding: 4px 12px;
@@ -569,7 +586,6 @@ input, select, textarea {
 </head>
 <body>
   <div class="app-container">
-    <!-- Header -->
     <div class="header">
       <div class="header-icon">🍰</div>
       <div class="header-content">
@@ -578,7 +594,6 @@ input, select, textarea {
       </div>
     </div>
 
-    <!-- Panel 1: Custos Fixos -->
     <div id="panel-costs" class="panel active">
       <div class="card">
         <div class="card-header">
@@ -658,16 +673,13 @@ input, select, textarea {
         </div>
       </div>
 
-      <!-- Mão de Obra -->
       <div class="card">
         <div class="card-header">
           <div>
             <div class="card-title">👥 Mão de Obra</div>
             <div class="card-subtitle">Gerencie sua equipe e custos com pessoal</div>
           </div>
-          <button class="btn btn-primary" id="btnAddLabor">
-            ➕ Adicionar Pessoa
-          </button>
+          <button class="btn btn-primary" id="btnAddLabor">➕ Adicionar Pessoa</button>
         </div>
 
         <div id="laborList"></div>
@@ -689,7 +701,6 @@ input, select, textarea {
       </div>
     </div>
 
-    <!-- Panel 2: Ingredientes -->
     <div id="panel-ingredients" class="panel">
       <div class="card">
         <div class="card-header">
@@ -697,16 +708,12 @@ input, select, textarea {
             <div class="card-title">🥚 Ingredientes</div>
             <div class="card-subtitle">Cadastre os ingredientes que você utiliza</div>
           </div>
-          <button class="btn btn-primary" id="btnAddIngredient">
-            ➕ Novo Ingrediente
-          </button>
+          <button class="btn btn-primary" id="btnAddIngredient">➕ Novo Ingrediente</button>
         </div>
-
         <div id="ingredientsContainer"></div>
       </div>
     </div>
 
-    <!-- Panel 3: Receitas -->
     <div id="panel-recipes" class="panel">
       <div class="card">
         <div class="card-header">
@@ -714,16 +721,12 @@ input, select, textarea {
             <div class="card-title">🍰 Receitas</div>
             <div class="card-subtitle">Crie receitas usando seus ingredientes</div>
           </div>
-          <button class="btn btn-primary" id="btnAddRecipe">
-            ➕ Nova Receita
-          </button>
+          <button class="btn btn-primary" id="btnAddRecipe">➕ Nova Receita</button>
         </div>
-
         <div id="recipesContainer"></div>
       </div>
     </div>
 
-    <!-- Panel 4: Cardápio (Produtos) -->
     <div id="panel-menu" class="panel">
       <div class="card">
         <div class="card-header">
@@ -732,20 +735,14 @@ input, select, textarea {
             <div class="card-subtitle">Monte seu cardápio com base nas receitas</div>
           </div>
           <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-            <button class="btn btn-primary" id="btnAddProduct">
-              ➕ Novo Item
-            </button>
-            <button class="btn btn-secondary" id="btnNormalize">
-              📊 Normalizar %
-            </button>
+            <button class="btn btn-primary" id="btnAddProduct">➕ Novo Item</button>
+            <button class="btn btn-secondary" id="btnNormalize">📊 Normalizar %</button>
           </div>
         </div>
-
         <div id="productsContainer"></div>
       </div>
     </div>
 
-    <!-- Panel 5: Resultados -->
     <div id="panel-results" class="panel">
       <div class="card">
         <div class="card-header">
@@ -801,31 +798,18 @@ input, select, textarea {
     </div>
   </div>
 
-  <!-- Tabs Navigation (Fixed Bottom) -->
   <nav class="tabs-nav">
-    <button class="tab-btn active" data-tab="costs">
-      🏪 <span>Custos</span>
-    </button>
-    <button class="tab-btn" data-tab="ingredients">
-      🥚 <span>Ingredientes</span>
-    </button>
-    <button class="tab-btn" data-tab="recipes">
-      🍰 <span>Receitas</span>
-    </button>
-    <button class="tab-btn" data-tab="menu">
-      📋 <span>Cardápio</span>
-    </button>
-    <button class="tab-btn" data-tab="results">
-      📊 <span>Resultados</span>
-    </button>
+    <button class="tab-btn active" data-tab="costs">🏪 <span>Custos</span></button>
+    <button class="tab-btn" data-tab="ingredients">🥚 <span>Ingredientes</span></button>
+    <button class="tab-btn" data-tab="recipes">🍰 <span>Receitas</span></button>
+    <button class="tab-btn" data-tab="menu">📋 <span>Cardápio</span></button>
+    <button class="tab-btn" data-tab="results">📊 <span>Resultados</span></button>
   </nav>
 
-  <!-- Modal Root -->
   <div id="modalRoot"></div>
 
   <script>
-    // ============ STATE ============
-    const STORAGE_KEY = 'doceria_precificacao_complete_v1';
+    const STORAGE_KEY = 'doceria_precificacao_complete_v2';
     let state = {
       config: {
         aluguel: '', energia: '', agua: '', internet: '', telefone: '', gas: '',
@@ -843,7 +827,7 @@ input, select, textarea {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) state = JSON.parse(raw);
       } catch (e) {
-        console.warn('Erro ao carregar estado:', e);
+        console.warn('Erro ao carregar:', e);
       }
     }
 
@@ -851,13 +835,12 @@ input, select, textarea {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (e) {
-        console.warn('Erro ao salvar estado:', e);
+        console.warn('Erro ao salvar:', e);
       }
     }
 
     loadState();
 
-    // ============ HELPERS ============
     function $(id) { return document.getElementById(id); }
     function genId() { return 'id' + Math.random().toString(36).slice(2, 9); }
     function money(v) {
@@ -873,128 +856,125 @@ input, select, textarea {
         .replace(/>/g, '&gt;');
     }
 
- // ============ LABOR ============
-function renderLabor() {
-  const list = $('laborList');
-  list.innerHTML = '';
-  
-  if (state.labor.length === 0) {
-    list.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-state-icon">👥</div>
-        <p>Nenhuma pessoa cadastrada ainda</p>
-      </div>
-    `;
-    calculateLabor();
-    return;
-  }
-  
-  state.labor.forEach((l, i) => {
-    const item = document.createElement('div');
-    item.className = 'product-item';
-    item.innerHTML = `
-      <div class="product-info">
-        <div class="product-name">${escapeHtml(l.name || 'Pessoa')}</div>
-        <div class="product-meta">
-          ${escapeHtml(l.role || 'Sem função')} • 
-          R$ ${Number(l.hourlyRate || 0).toFixed(2)}/h • 
-          ${Number(l.hoursMonth || 0)}h/mês
-        </div>
-      </div>
-      <div class="product-actions">
-        <button class="btn btn-secondary btn-sm lab-edit" data-i="${i}">✏️ Editar</button>
-        <button class="btn btn-danger btn-sm lab-remove" data-i="${i}">🗑️</button>
-      </div>
-    `;
-    list.appendChild(item);
-  });
-  
-  list.querySelectorAll('.lab-edit').forEach(btn => {
-    btn.addEventListener('click', () => {
-      openLaborModal(Number(btn.dataset.i));
-    });
-  });
-  
-  list.querySelectorAll('.lab-remove').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (confirm('Remover esta pessoa?')) {
-        state.labor.splice(Number(btn.dataset.i), 1);
-        saveState(); renderLabor(); calculateLabor();
+    function renderLabor() {
+      const list = $('laborList');
+      list.innerHTML = '';
+      
+      if (state.labor.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">👥</div>
+            <p>Nenhuma pessoa cadastrada ainda</p>
+          </div>
+        `;
+        calculateLabor();
+        return;
       }
-    });
-  });
-  
-  calculateLabor();
-} 
-
-function openLaborModal(index) {
-  const isNew = index === undefined || index === null;
-  const person = isNew ? {
-    name: '', role: '', hourlyRate: '', hoursMonth: ''
-  } : JSON.parse(JSON.stringify(state.labor[index]));
-  
-  const root = $('modalRoot');
-  root.innerHTML = `
-    <div class="modal-backdrop">
-      <div class="modal">
-        <h3>${isNew ? '➕ Nova Pessoa' : '✏️ Editar Pessoa'}</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Nome</label>
-            <input id="l_name" type="text" placeholder="Nome" value="${escapeHtml(person.name || '')}" />
+      
+      state.labor.forEach((l, i) => {
+        const item = document.createElement('div');
+        item.className = 'product-item';
+        item.innerHTML = `
+          <div class="product-info">
+            <div class="product-name">${escapeHtml(l.name || 'Pessoa')}</div>
+            <div class="product-meta">
+              ${escapeHtml(l.role || 'Sem função')} • 
+              R$ ${Number(l.hourlyRate || 0).toFixed(2)}/h • 
+              ${Number(l.hoursMonth || 0)}h/mês
+            </div>
           </div>
-          <div class="form-group">
-            <label>Função</label>
-            <input id="l_role" type="text" placeholder="Função" value="${escapeHtml(person.role || '')}" />
+          <div class="product-actions">
+            <button class="btn btn-secondary btn-sm lab-edit" data-i="${i}">✏️</button>
+            <button class="btn btn-danger btn-sm lab-remove" data-i="${i}">🗑️</button>
           </div>
-          <div class="form-group">
-            <label>R$ por Hora</label>
-            <input id="l_rate" type="number" placeholder="0,00" value="${person.hourlyRate || ''}" step="0.01" />
-          </div>
-          <div class="form-group">
-            <label>Horas por Mês</label>
-            <input id="l_hours" type="number" placeholder="0" value="${person.hoursMonth || ''}" />
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button class="btn btn-primary" id="l_save">💾 Salvar</button>
-          <button class="btn btn-secondary" id="l_close">❌ Cancelar</button>
-        </div>
-      </div>
-    </div>
-  `;
-  root.style.display = 'block';
-  
-  $('l_close').addEventListener('click', () => {
-    root.style.display = 'none';
-    root.innerHTML = '';
-  });
-  
-  $('l_save').addEventListener('click', () => {
-    const newPerson = {
-      name: $('l_name').value || '',
-      role: $('l_role').value || '',
-      hourlyRate: Number($('l_rate').value || 0),
-      hoursMonth: Number($('l_hours').value || 0)
-    };
-    
-    if (!newPerson.name) {
-      alert('Informe o nome da pessoa');
-      return;
+        `;
+        list.appendChild(item);
+      });
+      
+      list.querySelectorAll('.lab-edit').forEach(btn => {
+        btn.addEventListener('click', () => openLaborModal(Number(btn.dataset.i)));
+      });
+      
+      list.querySelectorAll('.lab-remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (confirm('Remover esta pessoa?')) {
+            state.labor.splice(Number(btn.dataset.i), 1);
+            saveState(); renderLabor(); calculateLabor();
+          }
+        });
+      });
+      
+      calculateLabor();
     }
-    
-    if (isNew) state.labor.push(newPerson);
-    else state.labor[index] = newPerson;
-    
-    saveState(); renderLabor(); calculateLabor();
-    root.style.display = 'none';
-    root.innerHTML = '';
-  });
-} 
 
-function addLaborPerson() {
-  openLaborModal();
-} 
+    function openLaborModal(index) {
+      const isNew = index === undefined || index === null;
+      const person = isNew ? {
+        name: '', role: '', hourlyRate: '', hoursMonth: ''
+      } : JSON.parse(JSON.stringify(state.labor[index]));
+      
+      const root = $('modalRoot');
+      root.innerHTML = `
+        <div class="modal-backdrop">
+          <div class="modal">
+            <h3>${isNew ? '➕ Nova Pessoa' : '✏️ Editar Pessoa'}</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Nome</label>
+                <input id="l_name" type="text" placeholder="Nome" value="${escapeHtml(person.name || '')}" />
+              </div>
+              <div class="form-group">
+                <label>Função</label>
+                <input id="l_role" type="text" placeholder="Função" value="${escapeHtml(person.role || '')}" />
+              </div>
+              <div class="form-group">
+                <label>R$ por Hora</label>
+                <input id="l_rate" type="number" placeholder="0,00" value="${person.hourlyRate || ''}" step="0.01" />
+              </div>
+              <div class="form-group">
+                <label>Horas por Mês</label>
+                <input id="l_hours" type="number" placeholder="0" value="${person.hoursMonth || ''}" />
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button class="btn btn-primary" id="l_save">💾 Salvar</button>
+              <button class="btn btn-secondary" id="l_close">❌ Cancelar</button>
+            </div>
+          </div>
+        </div>
+      `;
+      root.style.display = 'block';
+      
+      $('l_close').addEventListener('click', () => {
+        root.style.display = 'none';
+        root.innerHTML = '';
+      });
+      
+      $('l_save').addEventListener('click', () => {
+        const newPerson = {
+          name: $('l_name').value || '',
+          role: $('l_role').value || '',
+          hourlyRate: Number($('l_rate').value || 0),
+          hoursMonth: Number($('l_hours').value || 0)
+        };
+        
+        if (!newPerson.name) {
+          alert('Informe o nome da pessoa');
+          return;
+        }
+        
+        if (isNew) state.labor.push(newPerson);
+        else state.labor[index] = newPerson;
+        
+        saveState(); renderLabor(); calculateLabor();
+        root.style.display = 'none';
+        root.innerHTML = '';
+      });
+    }
+
+    function addLaborPerson() {
+      openLaborModal();
+    }
 
     function getLaborTotals() {
       let totalHours = 0, totalCost = 0;
@@ -1015,7 +995,6 @@ function addLaborPerson() {
       $('fixedOperational').textContent = money(getFixedCostsTotal());
     }
 
-    // ============ CONFIG ============
     function renderConfig() {
       const c = state.config;
       $('aluguel').value = c.aluguel || '';
@@ -1071,18 +1050,12 @@ function addLaborPerson() {
       return getFixedCostsOperational() + getLaborTotals().totalCost;
     }
 
-    // ============ INGREDIENTS ============
     function renderIngredients() {
       const cont = $('ingredientsContainer');
       cont.innerHTML = '';
 
       if (state.ingredients.length === 0) {
-        cont.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">🥚</div>
-            <p>Nenhum ingrediente cadastrado ainda</p>
-          </div>
-        `;
+        cont.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🥚</div><p>Nenhum ingrediente cadastrado ainda</p></div>';
         return;
       }
 
@@ -1090,7 +1063,7 @@ function addLaborPerson() {
         const item = document.createElement('div');
         item.className = 'ingredient-item';
         item.innerHTML = `
-          <input data-i="${i}" class="ing-name" placeholder="Nome do ingrediente" value="${escapeHtml(ing.name || '')}" />
+          <input data-i="${i}" class="ing-name" placeholder="Nome" value="${escapeHtml(ing.name || '')}" />
           <input data-i="${i}" class="ing-qty" type="number" placeholder="Qtd" value="${ing.quantity || ''}" />
           <select data-i="${i}" class="ing-unit">
             <option value="g" ${ing.unit === 'g' ? 'selected' : ''}>g</option>
@@ -1099,7 +1072,7 @@ function addLaborPerson() {
             <option value="L" ${ing.unit === 'L' ? 'selected' : ''}>L</option>
             <option value="un" ${ing.unit === 'un' ? 'selected' : ''}>un</option>
           </select>
-          <input data-i="${i}" class="ing-price" type="number" placeholder="R$ Preço" value="${ing.price || ''}" step="0.01" />
+          <input data-i="${i}" class="ing-price" type="number" placeholder="R$" value="${ing.price || ''}" step="0.01" />
           <button class="btn btn-danger btn-sm ing-remove" data-i="${i}">🗑️</button>
         `;
         cont.appendChild(item);
@@ -1134,7 +1107,7 @@ function addLaborPerson() {
       });
 
       cont.querySelectorAll('.ing-remove').forEach(btn => {
-        btn.addEventListener('click', e => {
+        btn.addEventListener('click', () => {
           if (confirm('Remover este ingrediente?')) {
             state.ingredients.splice(Number(btn.dataset.i), 1);
             saveState(); renderIngredients();
@@ -1148,18 +1121,12 @@ function addLaborPerson() {
       saveState(); renderIngredients();
     }
 
-    // ============ RECIPES ============
     function renderRecipes() {
       const cont = $('recipesContainer');
       cont.innerHTML = '';
 
       if (state.recipes.length === 0) {
-        cont.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">🍰</div>
-            <p>Nenhuma receita cadastrada ainda</p>
-          </div>
-        `;
+        cont.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🍰</div><p>Nenhuma receita cadastrada ainda</p></div>';
         return;
       }
 
@@ -1173,12 +1140,12 @@ function addLaborPerson() {
             <div class="recipe-meta">
               Rendimento: ${rec.yield || 0} un • 
               Ingredientes: ${rec.ingredients.length} • 
-              Custo Total: <strong>${money(totalCost)}</strong>
+              Custo: <strong>${money(totalCost)}</strong>
             </div>
           </div>
           <div class="recipe-actions">
-            <button class="btn btn-secondary btn-sm" data-idx="${idx}" data-action="edit">✏️ Editar</button>
-            <button class="btn btn-secondary btn-sm" data-idx="${idx}" data-action="dup">📋 Duplicar</button>
+            <button class="btn btn-secondary btn-sm" data-idx="${idx}" data-action="edit">✏️</button>
+            <button class="btn btn-secondary btn-sm" data-idx="${idx}" data-action="dup">📋</button>
             <button class="btn btn-danger btn-sm" data-idx="${idx}" data-action="remove">🗑️</button>
           </div>
         `;
@@ -1256,13 +1223,13 @@ function addLaborPerson() {
                   `).join('')}
                 </select>
                 <input id="r_ing_qty" type="number" placeholder="Quantidade" step="0.01" />
-                <button class="btn btn-secondary btn-sm" id="r_add_ing">➕ Adicionar</button>
+                <button class="btn btn-secondary btn-sm" id="r_add_ing">➕</button>
               </div>
 
               <div id="r_ingredients_list"></div>
 
               <div style="margin-top: 16px; padding: 16px; background: var(--bg); border-radius: var(--radius);">
-                <strong>Custo Total da Receita:</strong> <span id="r_total_cost">R$ 0,00</span>
+                <strong>Custo Total:</strong> <span id="r_total_cost">R$ 0,00</span>
               </div>
             </div>
 
@@ -1278,7 +1245,6 @@ function addLaborPerson() {
       function updateRecipeIngredientsList() {
         const list = document.getElementById('r_ingredients_list');
         list.innerHTML = '';
-
         let totalCost = 0;
 
         recipe.ingredients.forEach((recIng, i) => {
@@ -1340,7 +1306,7 @@ function addLaborPerson() {
         recipe.yield = Number(document.getElementById('r_yield').value || 1);
 
         if (recipe.ingredients.length === 0) {
-          alert('Adicione pelo menos um ingrediente à receita');
+          alert('Adicione pelo menos um ingrediente');
           return;
         }
 
@@ -1353,18 +1319,12 @@ function addLaborPerson() {
       });
     }
 
-    // ============ PRODUCTS (MENU) ============
     function renderProductsList() {
       const cont = $('productsContainer');
       cont.innerHTML = '';
 
       if (state.products.length === 0) {
-        cont.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">📋</div>
-            <p>Nenhum item no cardápio ainda</p>
-          </div>
-        `;
+        cont.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><p>Nenhum item no cardápio ainda</p></div>';
         return;
       }
 
@@ -1378,12 +1338,12 @@ function addLaborPerson() {
               Receita: ${getRecipeName(p.recipeId)} • 
               Embalagem: ${p.unitsPerPackage || 0} un • 
               Tempo: ${p.productionTimeHours || 0}h • 
-              Participação: ${p.participationPercent || 0}%
+              Part.: ${p.participationPercent || 0}%
             </div>
           </div>
           <div class="product-actions">
-            <button class="btn btn-secondary btn-sm" data-idx="${idx}" data-action="edit">✏️ Editar</button>
-            <button class="btn btn-secondary btn-sm" data-idx="${idx}" data-action="dup">📋 Duplicar</button>
+            <button class="btn btn-secondary btn-sm" data-idx="${idx}" data-action="edit">✏️</button>
+            <button class="btn btn-secondary btn-sm" data-idx="${idx}" data-action="dup">📋</button>
             <button class="btn btn-danger btn-sm" data-idx="${idx}" data-action="remove">🗑️</button>
           </div>
         `;
@@ -1462,7 +1422,7 @@ function addLaborPerson() {
                 <input id="m_unitsPack" type="number" value="${product.unitsPerPackage || 1}" />
               </div>
               <div class="form-group">
-                <label>Custo Ingredientes (R$) - Automático</label>
+                <label>Custo Ingredientes - Automático</label>
                 <input id="m_ing" type="number" step="0.01" value="0" disabled />
               </div>
               <div class="form-group">
@@ -1503,7 +1463,6 @@ function addLaborPerson() {
       }
 
       updateIngredientCost();
-
       document.getElementById('m_recipe').addEventListener('change', updateIngredientCost);
 
       $('m_close').addEventListener('click', () => {
@@ -1538,7 +1497,6 @@ function addLaborPerson() {
       });
     }
 
-    // ============ CALCULATIONS ============
     function calculatePerProduct(product) {
       const labor = getLaborTotals();
       const avgHourly = labor.avgHourly || 0;
@@ -1585,7 +1543,6 @@ function addLaborPerson() {
       };
     }
 
-    // ============ RESULTS & CHARTS ============
     let participationChart = null;
     let cmvChart = null;
 
@@ -1607,12 +1564,7 @@ function addLaborPerson() {
       qdiv.innerHTML = '';
 
       if (state.products.length === 0) {
-        qdiv.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">📦</div>
-            <p>Cadastre itens no cardápio para ver os resultados</p>
-          </div>
-        `;
+        qdiv.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📦</div><p>Cadastre itens no cardápio</p></div>';
         if (participationChart) {
           participationChart.destroy();
           participationChart = null;
@@ -1628,20 +1580,9 @@ function addLaborPerson() {
       state.products.forEach(p => totalParticipation += Number(p.participationPercent || 0));
 
       if (totalParticipation <= 0) {
-        qdiv.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">⚠️</div>
-            <p>Defina as porcentagens de participação dos itens</p>
-          </div>
-        `;
-        if (participationChart) {
-          participationChart.destroy();
-          participationChart = null;
-        }
-        if (cmvChart) {
-          cmvChart.destroy();
-          cmvChart = null;
-        }
+        qdiv.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><p>Defina as % de participação</p></div>';
+        if (participationChart) participationChart.destroy();
+        if (cmvChart) cmvChart.destroy();
         return;
       }
 
@@ -1652,7 +1593,7 @@ function addLaborPerson() {
         warn.style.borderRadius = 'var(--radius)';
         warn.style.marginBottom = '12px';
         warn.style.color = '#92400e';
-        warn.innerHTML = `⚠️ A soma das participações = ${totalParticipation.toFixed(1)}%. Use "Normalizar %" para ajustar para 100%.`;
+        warn.innerHTML = `⚠️ Soma = ${totalParticipation.toFixed(1)}%. Use "Normalizar %"`;
         qdiv.appendChild(warn);
       }
 
@@ -1672,7 +1613,7 @@ function addLaborPerson() {
           <div class="product-info">
             <div class="product-name">${escapeHtml(p.name)}</div>
             <div class="product-meta">
-              Preço Direto: <strong>${money(calc.precoDireto)}</strong> • 
+              Direto: <strong>${money(calc.precoDireto)}</strong> • 
               iFood: <strong>${money(calc.precoIfood)}</strong> • 
               CMV: <strong>${calc.cmv.toFixed(1)}%</strong>
             </div>
@@ -1753,7 +1694,6 @@ function addLaborPerson() {
       return out;
     }
 
-    // ============ UI / EVENTS ============
     function attachInputSync() {
       const ids = [
         'aluguel', 'energia', 'agua', 'internet', 'telefone', 'gas',
@@ -1803,15 +1743,27 @@ function addLaborPerson() {
       document.querySelectorAll('.tab-btn').forEach(b => {
         b.classList.toggle('active', b.dataset.tab === name);
       });
-      $('panel-costs').classList.toggle('active', name === 'costs');
-      $('panel-ingredients').classList.toggle('active', name === 'ingredients');
-      $('panel-recipes').classList.toggle('active', name === 'recipes');
-      $('panel-menu').classList.toggle('active', name === 'menu');
-      $('panel-results').classList.toggle('active', name === 'results');
+      
+      document.querySelectorAll('.panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
+      
+      const panelMap = {
+        'costs': 'panel-costs',
+        'ingredients': 'panel-ingredients',
+        'recipes': 'panel-recipes',
+        'menu': 'panel-menu',
+        'results': 'panel-results'
+      };
+      
+      const targetPanel = document.getElementById(panelMap[name]);
+      if (targetPanel) {
+        targetPanel.classList.add('active');
+      }
+      
       if (name === 'results') calculateResults();
     }
 
-    // ============ INIT ============
     window.addEventListener('load', () => {
       renderConfig();
       renderLabor();
